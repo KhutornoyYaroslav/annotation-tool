@@ -1,4 +1,4 @@
-# from .config import _CFG as cfg
+from .default import cfg_ as cfg
 
 
-# __all__ = ['cfg']
+__all__ = ['cfg']

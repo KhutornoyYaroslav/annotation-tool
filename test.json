@@ -1,9 +1,0 @@
-{
-    "keypoints" : {
-        "fl_wheel" : {
-            "x" : 100,
-            "y" : 200
-        },
-        "bl_wheel" : null
-    }
-}

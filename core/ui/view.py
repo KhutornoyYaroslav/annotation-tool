@@ -29,8 +29,9 @@ class ViewEvents(QObject):
 
 
 class View(QtWidgets.QMainWindow):
-    def __init__(self):
+    def __init__(self, cfg):
         QtWidgets.QMainWindow.__init__(self)
+        self.cfg = cfg
         # Events
         self.events = ViewEvents()
         # Widgets
@@ -71,7 +72,7 @@ class View(QtWidgets.QMainWindow):
         self.setCentralWidget(self.top_widget)
         self.top_widget.setLayout(self.top_layout)
         self.top_layout.addWidget(self.canvas_widget)
-        self.canvas_widget.setMinimumSize(512, 512)
+        # self.canvas_widget.setMinimumSize(512, 512)
         # Tools area widgets
         self.top_layout.addWidget(self.tools_widget)
         self.tools_widget.setLayout(self.tools_layout)
@@ -82,6 +83,14 @@ class View(QtWidgets.QMainWindow):
         self.objects_widget.initGUI()
         self.tools_layout.addWidget(self.keypoints_widget)
         self.keypoints_widget.initGUI()
+        # Set app window size
+        if self.cfg.ui.wnd.fullscreen:
+            self.showFullScreen()
+        elif self.cfg.ui.wnd.maximized:
+            self.showMaximized()
+        else:
+            self.resize(self.cfg.ui.wnd.size[0], self.cfg.ui.wnd.size[1])
+
 
     def on_menubar_files_changed(self, files: List[str]):
         self.events.files_open.emit(files)
