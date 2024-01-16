@@ -1,0 +1,25 @@
+--- Shapes ---
+Shapes based on points:
+- Point
+- Polyline
+- Polygon
+- BoundingRect
+- BoundingBox
+- Keypoints
+
+Shapes based on bitmap:
+- Mask
+
+--- Objects ---
+Object should have:
+- Class
+- Id (UUID)
+- Shapes
+
+Object can have multiple shapes. For instance, object 'Car' can
+simultaneously have BoundingRect, BoundingBox, Keypoints shapes.
+
+Should objects have predefined set of shapes or shapes can be added
+dynamically? We need to set up shapes to object class in objects classes
+configurator.
+

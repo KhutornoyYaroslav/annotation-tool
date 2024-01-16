@@ -1,0 +1,143 @@
+{
+    "fname": "C:/repos/annotation-tool/data\\carla1.png",
+    "annotation_done": false,
+    "objects": [
+        {
+            "uuid": "1dbfa65d-81e6-495c-884b-8ee00b76d0a1",
+            "shape": {
+                "name": "car",
+                "keypoints": {
+                    "fl wheel": {
+                        "x": 891,
+                        "y": 522
+                    },
+                    "bl wheel": {
+                        "x": 948,
+                        "y": 529
+                    },
+                    "br wheel": {
+                        "x": null,
+                        "y": null
+                    },
+                    "fr wheel": {
+                        "x": null,
+                        "y": null
+                    },
+                    "windshield tr": {
+                        "x": null,
+                        "y": null
+                    },
+                    "windshield tl": {
+                        "x": null,
+                        "y": null
+                    },
+                    "windshield bl": {
+                        "x": null,
+                        "y": null
+                    },
+                    "windshield br": {
+                        "x": null,
+                        "y": null
+                    },
+                    "rear window tl": {
+                        "x": null,
+                        "y": null
+                    },
+                    "rear window tr": {
+                        "x": null,
+                        "y": null
+                    },
+                    "rear window br": {
+                        "x": null,
+                        "y": null
+                    },
+                    "rear window bl": {
+                        "x": null,
+                        "y": null
+                    },
+                    "rearview mirror l": {
+                        "x": null,
+                        "y": null
+                    },
+                    "rearview mirror r": {
+                        "x": null,
+                        "y": null
+                    },
+                    "bottom of license fr": {
+                        "x": null,
+                        "y": null
+                    },
+                    "bottom of license fl": {
+                        "x": null,
+                        "y": null
+                    },
+                    "bottom of license bl": {
+                        "x": null,
+                        "y": null
+                    },
+                    "bottom of license br": {
+                        "x": null,
+                        "y": null
+                    },
+                    "headlight fr inner bottom": {
+                        "x": null,
+                        "y": null
+                    },
+                    "headlight fr outer top": {
+                        "x": null,
+                        "y": null
+                    },
+                    "headlight fl inner bottom": {
+                        "x": null,
+                        "y": null
+                    },
+                    "headlight fl outer top": {
+                        "x": null,
+                        "y": null
+                    },
+                    "headlight bl inner bottom": {
+                        "x": null,
+                        "y": null
+                    },
+                    "headlight bl outer top": {
+                        "x": null,
+                        "y": null
+                    },
+                    "headlight br inner bottom": {
+                        "x": null,
+                        "y": null
+                    },
+                    "headlight br outer top": {
+                        "x": null,
+                        "y": null
+                    },
+                    "bottom bumper fl": {
+                        "x": null,
+                        "y": null
+                    },
+                    "bottom bumper bl": {
+                        "x": null,
+                        "y": null
+                    },
+                    "bottom bumper br": {
+                        "x": null,
+                        "y": null
+                    },
+                    "bottom bumper fr": {
+                        "x": null,
+                        "y": null
+                    },
+                    "side window back l": {
+                        "x": null,
+                        "y": null
+                    },
+                    "side window back r": {
+                        "x": null,
+                        "y": null
+                    }
+                }
+            },
+            "tags": []
+        }
+    ]
+}

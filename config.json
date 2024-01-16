@@ -1,0 +1,30 @@
+{
+    "version": 1,
+    "classes": [
+        {
+            "title": "car",
+            "shapes": [
+
+            ],
+            "color": {
+                "r": 30,
+                "g": 50,
+                "b": 70
+            }
+        },
+        {
+            "title": "person",
+            "shapes": []
+        }
+    ],
+    "ui": {
+        "resolution": [800, 600],
+        "fullscreen": true,
+        "bg_color": {
+            "r": 10,
+            "g": 20,
+            "b": 30
+        }
+    }
+}
+

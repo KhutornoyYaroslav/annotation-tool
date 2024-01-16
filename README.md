@@ -1,2 +1,3 @@
 # annotation-tool
-Simple gui application for dataset annotation
+
+Road traffic scenes annotation tools

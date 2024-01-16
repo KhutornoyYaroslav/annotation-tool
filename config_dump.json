@@ -1,0 +1,11 @@
+{
+    "version": 0,
+    "classes": [],
+    "ui": {
+        "resolution": [
+            800,
+            600
+        ],
+        "fullscreen": false
+    }
+}
