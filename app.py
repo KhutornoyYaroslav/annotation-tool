@@ -3,8 +3,8 @@ import argparse
 from PyQt5 import QtWidgets
 from core.config import cfg
 from core.ui.view import View
-# from core.engine.model import Model
-# from core.controller.controller import Controller
+from core.engine.model import Model
+from core.controller.controller import Controller
 
 
 def main() -> int:
@@ -15,15 +15,15 @@ def main() -> int:
     args = parser.parse_args()
 
     # Read config
+    cfg.save('config_defaults.json')
     cfg.load(args.config_file)
     cfg.lock()
-    # cfg.save('config.json')
 
     # Run app
     app = QtWidgets.QApplication(sys.argv)
-    # model = Model()
+    model = Model(cfg)
     view = View(cfg)
-    # controller = Controller(app, view, model)
+    controller = Controller(app, view, model)
     view.initGUI()
     view.show()
 

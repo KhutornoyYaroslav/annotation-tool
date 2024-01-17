@@ -3,6 +3,6 @@ from PyQt5.QtGui import QPainter
 from typing import Optional, Callable
 
 
-class Drawable():
+class QtDrawable():
     def draw(self, painter: QPainter, img2viewport: Optional[Callable[[QPoint], QPoint]] = None):
         raise NotImplementedError

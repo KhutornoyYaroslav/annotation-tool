@@ -1,7 +1,8 @@
 from typing import List, Tuple
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import pyqtSignal, QObject
-from core.ui.graphics.drawable import Drawable
+# from core.ui.graphics.drawable import Drawable
+from core.utils.basicconfig import Config
 from core.ui.widgets import (
     MenuBar,
     StatusBar,
@@ -12,6 +13,7 @@ from core.ui.widgets import (
 )
 
 
+
 class ViewEvents(QObject):
     app_exit = pyqtSignal()
     files_open = pyqtSignal(list)
@@ -19,7 +21,7 @@ class ViewEvents(QObject):
     files_current_changed = pyqtSignal(int)
     edit_undo = pyqtSignal()
     edit_redo = pyqtSignal()
-    object_created = pyqtSignal()
+    object_created = pyqtSignal(int)
     object_removed = pyqtSignal(int)
     object_current_changed = pyqtSignal(int)
     keypoint_current_changed = pyqtSignal(int)
@@ -29,9 +31,9 @@ class ViewEvents(QObject):
 
 
 class View(QtWidgets.QMainWindow):
-    def __init__(self, cfg):
+    def __init__(self, cfg: Config):
         QtWidgets.QMainWindow.__init__(self)
-        self.cfg = cfg
+        self._cfg = cfg
         # Events
         self.events = ViewEvents()
         # Widgets
@@ -46,7 +48,7 @@ class View(QtWidgets.QMainWindow):
         self.objects_widget = ObjectsWidget(self.tools_widget)
         self.keypoints_widget = KeypointsWidget(self.tools_widget)
         # Connect to widgets events
-        self.menubar_widget.events.files_open.connect(self.on_menubar_files_changed)
+        self.menubar_widget.events.files_open.connect(self.events.files_open.emit)
         self.menubar_widget.events.files_close_all.connect(self.events.files_close_all.emit)
         self.menubar_widget.events.app_exit.connect(self.events.app_exit.emit)
         self.menubar_widget.events.undo.connect(self.events.edit_undo.emit)
@@ -59,6 +61,11 @@ class View(QtWidgets.QMainWindow):
         self.keypoints_widget.events.keypoint_disabled.connect(self.events.keypoint_disabled.emit)
         self.canvas_widget.events.mouse_left_clicked.connect(self.events.canvas_mouse_left_clicked.emit)
         self.canvas_widget.events.mouse_right_clicked.connect(self.events.canvas_mouse_right_clicked.emit)
+
+        self._initialize()
+
+    def _initialize(self):
+        self.canvas_widget.set_zoom_factor(self._cfg.control.zoom_factor)
 
     def initGUI(self):
         self.setWindowTitle('Annotation tool')
@@ -84,16 +91,11 @@ class View(QtWidgets.QMainWindow):
         self.tools_layout.addWidget(self.keypoints_widget)
         self.keypoints_widget.initGUI()
         # Set app window size
-        if self.cfg.ui.wnd.fullscreen:
-            self.showFullScreen()
-        elif self.cfg.ui.wnd.maximized:
+        self.resize(self._cfg.view.appearance.wndsize[0], self._cfg.view.appearance.wndsize[1])
+        if self._cfg.view.appearance.maximized:
             self.showMaximized()
-        else:
-            self.resize(self.cfg.ui.wnd.size[0], self.cfg.ui.wnd.size[1])
-
-
-    def on_menubar_files_changed(self, files: List[str]):
-        self.events.files_open.emit(files)
+        if self._cfg.view.appearance.fullscreen:
+            self.showFullScreen()
 
     def set_files_list(self, fnames: List[str]):
         self.files_widget.set_files(fnames)
@@ -101,20 +103,24 @@ class View(QtWidgets.QMainWindow):
     def set_objects_list(self, objects: List[str]):
         self.objects_widget.set_objects(objects)
 
+    def set_object_classes(self, classes: List[str]):
+        self.objects_widget.set_object_classes(classes)
+
     def set_keypoints_list(self, keypoints: List[str]):
         self.keypoints_widget.set_keypoints(keypoints)
 
     def set_curent_keypoint(self, idx: int):
         self.keypoints_widget.set_current_row(idx)
 
-    def set_background_image(self, fname: str): # TODO: rename to 'set_canvas_image' ?
-        self.canvas_widget.set_background_image(fname)
+    def set_canvas_image(self, fname: str) -> bool:
+        return self.canvas_widget.set_canvas_image(fname)
 
-    def clear_background(self): # TODO: rename 'canvas'
+    def clear_canvas(self):
         self.canvas_widget.clear()
 
-    def repaint_background(self): # TODO: rename 'canvas'
+    def repaint_canvas(self):
         self.canvas_widget.repaint()
 
-    def set_drawables(self, items: List[Drawable]):
+    # TODO: fix
+    def set_drawables(self, items):# : List[Drawable]):
         self.canvas_widget.set_drawables(items)

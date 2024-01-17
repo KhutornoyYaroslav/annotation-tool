@@ -1,10 +1,11 @@
 from typing import List
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import pyqtSignal, QObject
+from core.ui.dialogs.newobject import NewObjectDialog
 
 
 class ObjectsWidgetEvents(QObject):
-    object_created = pyqtSignal()
+    object_created = pyqtSignal(int)
     object_removed = pyqtSignal(int)
     curr_object_changed = pyqtSignal(int)
 
@@ -12,6 +13,7 @@ class ObjectsWidgetEvents(QObject):
 class ObjectsWidget(QtWidgets.QGroupBox):
     def __init__(self, parent):
         QtWidgets.QWidget.__init__(self, parent)
+        self._obj_classes = []
         # Events
         self.events = ObjectsWidgetEvents(self)
         # Widgets
@@ -37,8 +39,8 @@ class ObjectsWidget(QtWidgets.QGroupBox):
         self.buttons_layout.addWidget(self.button_remove)
 
         # Buttons
-        self.button_create.setText("Create")
-        self.button_create.clicked.connect(self.events.object_created.emit)
+        self.button_create.setText("New...")
+        self.button_create.clicked.connect(self.on_object_new)
 
         self.button_remove.setText("Remove")
         self.button_remove.clicked.connect(self.on_object_removed)
@@ -50,6 +52,9 @@ class ObjectsWidget(QtWidgets.QGroupBox):
         if self.list_widget.count() > 0:
             self.list_widget.setCurrentRow(0)
 
+    def set_object_classes(self, classes: List[str]):
+        self._obj_classes = classes
+
     def on_object_removed(self):
         curr_idx = self.list_widget.currentRow()
         if curr_idx >= 0:
@@ -58,3 +63,13 @@ class ObjectsWidget(QtWidgets.QGroupBox):
     def on_current_row_changed(self, cur: int):
         if cur != -1:
             self.events.curr_object_changed.emit(cur)
+
+    def on_object_new(self):
+        dialog = NewObjectDialog(self)
+        dialog.initGUI()
+        dialog.set_object_classes(self._obj_classes)
+
+        if dialog.exec():
+            class_idx = dialog.get_current_row()
+            if class_idx != -1:
+                self.events.object_created.emit(class_idx)

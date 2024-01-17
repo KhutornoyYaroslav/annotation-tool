@@ -4,8 +4,8 @@
             "fullscreen": false,
             "maximized": false,
             "wndsize": [
-                1000,
-                800
+                800,
+                600
             ]
         }
     },
@@ -15,21 +15,9 @@
     "annotation": {
         "classes": [
             {
-                "name": "person",
+                "name": "default_class",
                 "shapes": [
-                    "BoundingRect"
-                ]
-            },
-            {
-                "name": "car",
-                "shapes": [
-                    "BoundingRect"
-                ]
-            },
-            {
-                "name": "dog",
-                "shapes": [
-                    "BoundingRect"
+                    "boundingrect"
                 ]
             }
         ]

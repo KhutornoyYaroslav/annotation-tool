@@ -5,7 +5,7 @@ from typing import Tuple, List
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import pyqtSignal, QObject, QPoint
 from core.ui.graphics.panandzoom import PanAndZoom
-from core.ui.graphics.drawable import Drawable
+# from core.ui.graphics.drawable import Drawable
 
 
 class CanvasWidgetEvents(QObject):
@@ -24,19 +24,24 @@ class CanvasWidget(QtWidgets.QOpenGLWidget):
         self.mouse_prev_press_event_pos = QPoint(0, 0)
         self.mouse_prev_press_event_button = QPoint(0, 0)
         self.drawables = []
+        self._zoom_factor = 1.25
 
     def clear(self):
         self.canvas.clear()
         self.gl_buffer_reload_flag = False
 
-    def set_background_image(self, path: str) -> bool:
+    def set_canvas_image(self, path: str) -> bool:
         if self.canvas.load_image(path):
             self.gl_buffer_reload_flag = True
             return True
 
         return False
 
-    def set_drawables(self, items: List[Drawable]):
+    def set_zoom_factor(self, factor: float):
+        self._zoom_factor = factor
+
+    # TODO: fix
+    def set_drawables(self, items): # : List[Drawable]):
         self.drawables = items
 
     def mousePressEvent(self, a0: QtGui.QMouseEvent) -> None:
@@ -179,7 +184,7 @@ class CanvasWidget(QtWidgets.QOpenGLWidget):
 
     def wheelEvent(self, a0: QtGui.QWheelEvent) -> None:
         if not self.canvas.is_empty():
-            scale = 1.25
+            scale = self._zoom_factor
             if a0.angleDelta().y() <= 0:
                 scale = 1 / scale
             self.canvas.zoom(scale)

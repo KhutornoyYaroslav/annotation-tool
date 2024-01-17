@@ -1,83 +1,68 @@
 from uuid import UUID, uuid4
-from typing import Dict, Optional, Union
-# from core.engine.shapes.baseshape import BaseShape
+from typing import List, Dict, Optional
 from core.utils.serializable import Serializable
-
-from core.engine.shape import ShapeInterface, ShapeType
+from core.engine.shapes import ShapeInterface, ShapeType, create_shape
 
 
 class Object(Serializable):
-    def __init__(self, shape: ShapeInterface, class_: str, uuid: Optional[UUID] = None):
-        self._shape = shape # TODO: object can have multiple shapes (video annotation, for example)
-        self._class = class_
+    def __init__(self, shapes: List[ShapeInterface], class_name: str, uuid: Optional[UUID] = None):
+        assert len(shapes) != 0
+        self._shapes = shapes
+        self._class_name = class_name
         self._uuid = uuid4() if uuid is None else uuid
 
-    def serialize(self) -> Dict:
-        data = {
-            'uuid': str(self._uuid),
-            'class': self._class,
-            'shape': self._shape.serialize()
-        }
+    def is_empty(self):
+        for shape in self._shapes:
+            if shape.is_empty():
+                return True
 
-        return data
+        return False
+
+    def get_info(self) -> str:
+        return self._class_name + " [" + str(self._uuid) + "]"
+
+    def serialize(self) -> Dict:
+        return super().serialize()
 
     def deserialize(self, data: Dict):
-        self._uuid = UUID(data['uuid'])
-        self._class = data['class']
-        self._shape.deserialize(data['shape'])
+        return super().deserialize(data)
 
 
 class ObjectFactory():
     def __init__(self):
-        self._object_classes = dict()
+        self._classes = {}
 
+    def register_class(self, name: str, shapes: List[ShapeType]) -> bool:
+        if name not in self._classes and len(shapes):
+            self._classes[name] = shapes
+            return True
 
-    # def register_class(self, class_: str, shape_type: ShapeType):
-    #     self._object_classes[class_] = shape_type
+        return False
 
-    # def unregister_class(self, class_: str):
-    #     self._object_classes.pop(class_, None)
+    def get_registered_classes(self, full_info: bool = False) -> List[str]:
+        result = []
+        for name, shapes in self._classes.items():
+            info = name
+            if full_info:
+                info += f" [" + ", ".join([s.name for s in shapes]) + "]"
+            result.append(info)
 
-    # def create(self, class_: str) -> Union[Object, None]:
-    #     shape_type = self._object_classes.get(class_, None)
-    #     if shape_type is not None:
-    #         # return Object(shape, class_)
-    #         # TODO: create Object
-    #         return None
+        return result
 
-    #     return None
+    def unregister_class(self, name: str):
+        self._classes.pop(name, None)
 
+    def unregister_all_classes(self):
+        self._classes.clear()
 
+    def create_object(self, class_name: str) -> Object:
+        shape_types = self._classes.get(class_name, None)
+        if shape_types is not None:
+            shapes = []
+            for stype in shape_types:
+                shape = create_shape(stype)
+                shapes.append(shape)
 
+            return Object(shapes, class_name)
 
-
-
-
-
-
-
-# # TODO: может быть этот класс лишний? Странная обертка вокруг shape-ов.
-# class AnnotationObject(Serializable):
-#     def __init__(self, shape: BaseShape, tags: List[str] = [], uuid: Optional[UUID] = None):
-#         self.tags = tags
-#         self.shape = shape
-#         self.uuid = uuid4() if uuid is None else uuid
-
-#     def __str__(self):
-#         return f"{str(self.shape)} [{str(self.uuid)}]"
-
-#     def is_empty(self) -> bool:
-#         return self.shape.is_empty()
-
-#     def serialize(self) -> Dict:
-#         data = {}
-#         data['uuid'] = str(self.uuid)
-#         data['shape'] = self.shape.serialize()
-#         data['tags'] = self.tags
-
-#         return data
-
-#     def deserialize(self, data: Dict):
-#         self.uuid = UUID(data['uuid'])
-#         self.shape.deserialize(data['shape'])
-#         self.tags = data['tags']
+        return None
