@@ -45,7 +45,7 @@ class Model():
                 ctx.get().save()
 
     def close(self):
-        self.save_all()
+        # self.save_all() # TODO: uncomment later
         self._file_contexts.clear()
         self._cur_file_idx = 0
 
@@ -58,7 +58,7 @@ class Model():
             if file.endswith(tuple(self._cfg.files.valid_extensions)):
                 files_filtered.append(file)
 
-        self.save_all()
+        # self.save_all() # TODO: uncomment later
         self._file_contexts.clear()
         for file in files_filtered:
             context = UndoRedoContainer()

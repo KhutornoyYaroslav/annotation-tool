@@ -7,7 +7,7 @@ from core.ui.dialogs.newobject import NewObjectDialog
 class ObjectsWidgetEvents(QObject):
     object_created = pyqtSignal(int)
     object_removed = pyqtSignal(int)
-    curr_object_changed = pyqtSignal(int)
+    current_object_changed = pyqtSignal(int)
 
 
 class ObjectsWidget(QtWidgets.QGroupBox):
@@ -62,7 +62,7 @@ class ObjectsWidget(QtWidgets.QGroupBox):
 
     def on_current_row_changed(self, cur: int):
         if cur != -1:
-            self.events.curr_object_changed.emit(cur)
+            self.events.current_object_changed.emit(cur)
 
     def on_object_new(self):
         dialog = NewObjectDialog(self)

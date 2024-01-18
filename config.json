@@ -15,13 +15,7 @@
     "annotation": {
         "classes": [
             {
-                "name": "person",
-                "shapes": [
-                    "BoundingRect"
-                ]
-            },
-            {
-                "name": "car",
+                "name": "cat",
                 "shapes": [
                     "BoundingRect"
                 ]
@@ -29,6 +23,7 @@
             {
                 "name": "dog",
                 "shapes": [
+                    "BoundingRect",
                     "BoundingRect"
                 ]
             }

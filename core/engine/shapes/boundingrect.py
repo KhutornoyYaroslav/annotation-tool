@@ -18,6 +18,14 @@ class BoundingRect(ShapeInterface):
 
     def get_points_list(self) -> List[str]:
         return list(self._points.keys())
+    
+    def get_points_info(self) -> List[Tuple[str, str]]:
+        result = []
+        for key, val in self._points.items():
+            val_str = "none" if val is None else ", ".join([val.x(), val.y()])
+            result.append((key, val_str))
+
+        return result
 
     def get_current_point(self) -> Union[QPoint, None]:
         if not self._points:

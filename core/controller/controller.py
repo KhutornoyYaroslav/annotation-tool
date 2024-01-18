@@ -17,11 +17,11 @@ class Controller():
         self._view.events.edit_undo.connect(self.on_view_undo)
         self._view.events.edit_redo.connect(self.on_view_redo)
         self._view.events.files_open.connect(self.on_view_files_open)
-        # self.view.events.files_close_all.connect(self.on_view_files_close_all)
-        # self.view.events.files_current_changed.connect(self.on_view_files_curr_changed)
+        self._view.events.files_close_all.connect(self.on_view_files_close_all)
+        self._view.events.files_current_changed.connect(self.on_view_files_current_changed)
         self._view.events.object_created.connect(self.on_view_object_created)
         self._view.events.object_removed.connect(self.on_view_object_removed)
-        # self.view.events.object_current_changed.connect(self.on_view_obejct_curr_changed)
+        self._view.events.object_current_changed.connect(self.on_view_obejct_current_changed)
         # self.view.events.keypoint_current_changed.connect(self.on_view_keypoint_cur_changed)
         # self.view.events.keypoint_disabled.connect(self.on_view_keypoint_disabled)
         # self.view.events.canvas_mouse_left_clicked.connect(self.on_view_canvas_mouse_left_clicked)
@@ -34,89 +34,95 @@ class Controller():
 
     def on_view_files_open(self, files: List[str]):
         self._model.set_files(files)
+        # Files
         actual_files = self._model.get_files()
         self._view.set_files_list(actual_files)
-
+        # Canvas
         self._view.clear_canvas()
+        self._view.repaint_canvas()
         cur_ctx = self._model.get_current_context()
         if cur_ctx is not None:
             if self._view.set_canvas_image(cur_ctx.get().get_fname()):
                 self._view.repaint_canvas()
+                # Objects
                 objs = cur_ctx.get().get_objects_list()
                 self._view.set_objects_list(objs)
-                # TODO:
-                # cur_obj = cur_ctx.get().get_current_object()
-                # if cur_obj is not None:
-                #     keypoints = list(cur_obj.shape.keypoints.keys())
-                #     self.view.set_keypoints_list(keypoints)
-                # else:
-                #     self.view.set_keypoints_list([])
+                # Shapes
+                shapes = {}
+                cur_obj = cur_ctx.get().get_current_object()
+                if cur_obj is not None:
+                    shapes = cur_obj.get_shapes_info()
+                self._view.set_object_shapes(shapes)
 
-    # def on_view_files_close_all(self):
-    #     self.model.set_files([], ignore_empty=False)
-    #     actual_files = self.model.get_files()
-    #     self.view.set_files_list(actual_files)
-    #     self.view.clear_background()
-    #     self.view.repaint_background()
-    #     self.view.set_objects_list([])
-    #     self.view.set_keypoints_list([])
+    def on_view_files_close_all(self):
+        self._model.close()
+        # Files
+        actual_files = self._model.get_files()
+        self._view.set_files_list(actual_files)
+        # Canvas
+        self._view.clear_canvas()
+        self._view.repaint_canvas()
+        # Objects
+        self._view.set_objects_list([])
+        # Shapes
+        self._view.set_object_shapes({})
 
-    # def on_view_files_curr_changed(self, curr_idx: int):
-    #     if curr_idx != self.model.get_curr_file_idx():
-    #         if self.model.set_curr_file_idx(curr_idx):
-    #             pass
-    #     # TODO: избыточная перерисовка?
-    #     curr_ctx = self.model.get_current_file_context()
-    #     if curr_ctx is not None:
-    #         self.view.set_background_image(curr_ctx.get().fname)
-    #         self.view.repaint_background()
-    #         objects = [str(obj) for obj in curr_ctx.get().objects]
-    #         self.view.set_objects_list(objects)
-    #         cur_obj = curr_ctx.get().get_current_object()
-    #         if cur_obj is not None:
-    #             keypoints = list(cur_obj.shape.keypoints.keys())
-    #             self.view.set_keypoints_list(keypoints)
-    #         else:
-    #             self.view.set_keypoints_list([])
+    def on_view_files_current_changed(self, cur_idx: int):
+        if cur_idx != self._model.get_current_file_idx():
+            if self._model.set_current_file_idx(cur_idx):
+                cur_ctx = self._model.get_current_context()
+                if cur_ctx is not None:
+                    # Canvas
+                    self._view.set_canvas_image(cur_ctx.get().get_fname())
+                    self._view.repaint_canvas()
+                    # Objects
+                    objs = cur_ctx.get().get_objects_list()
+                    self._view.set_objects_list(objs)
+                    # Shapes
+                    shapes = {}
+                    cur_obj = cur_ctx.get().get_current_object()
+                    if cur_obj is not None:
+                        shapes = cur_obj.get_shapes_info()
+                    self._view.set_object_shapes(shapes)
 
     def on_view_object_created(self, class_idx: int):
         if self._model.create_object(class_idx):
             cur_ctx = self._model.get_current_context()
             if cur_ctx is not None:
+                # Objects
                 objs = cur_ctx.get().get_objects_list()
                 self._view.set_objects_list(objs)
-                # TODO:
-                # cur_obj = cur_ctx.get().get_current_object()
-                # if cur_obj is not None:
-                #     keypoints = list(cur_obj.shape.keypoints.keys())
-                #     self.view.set_keypoints_list(keypoints)
-                # else:
-                #     self.view.set_keypoints_list([])
+                # Shapes
+                shapes = {}
+                cur_obj = cur_ctx.get().get_current_object()
+                if cur_obj is not None:
+                    shapes = cur_obj.get_shapes_info()
+                self._view.set_object_shapes(shapes)
 
     def on_view_object_removed(self, idx: int):
         cur_ctx = self._model.get_current_context()
         if cur_ctx is not None:
             if cur_ctx.get().remove_object(idx):
+                # Objects
                 objs = cur_ctx.get().get_objects_list()
                 self._view.set_objects_list(objs)
-                # TODO:
-                # cur_obj = curr_ctx.get().get_current_object()
-                # if cur_obj is not None:
-                #     keypoints = list(cur_obj.shape.keypoints.keys())
-                #     self.view.set_keypoints_list(keypoints)
-                # else:
-                #     self.view.set_keypoints_list([])
+                # Shapes
+                shapes = {}
+                cur_obj = cur_ctx.get().get_current_object()
+                if cur_obj is not None:
+                    shapes = cur_obj.get_shapes_info()
+                self._view.set_object_shapes(shapes)
 
-    # def on_view_obejct_curr_changed(self, curr_idx: int):
-    #     curr_ctx = self.model.get_current_file_context()
-    #     if curr_ctx is not None:
-    #         if curr_ctx.get().set_curr_object_idx(curr_idx):
-    #             cur_obj = curr_ctx.get().get_current_object()
-    #             if cur_obj is not None:
-    #                 keypoints = list(cur_obj.shape.keypoints.keys())
-    #                 self.view.set_keypoints_list(keypoints)
-    #             else:
-    #                 self.view.set_keypoints_list([])
+    def on_view_obejct_current_changed(self, cur_idx: int):
+        cur_ctx = self._model.get_current_context()
+        if cur_ctx is not None:
+            if cur_ctx.get().set_curr_object_idx(cur_idx):
+                # Shapes
+                shapes = {}
+                cur_obj = cur_ctx.get().get_current_object()
+                if cur_obj is not None:
+                    shapes = cur_obj.get_shapes_info()
+                self._view.set_object_shapes(shapes)
 
     # def on_view_keypoint_cur_changed(self, cur: int):
     #     cur_ctx = self.model.get_current_file_context()

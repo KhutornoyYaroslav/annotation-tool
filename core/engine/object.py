@@ -1,5 +1,5 @@
 from uuid import UUID, uuid4
-from typing import List, Dict, Optional
+from typing import List, Dict, Tuple, Optional
 from core.utils.serializable import Serializable
 from core.engine.shapes import ShapeInterface, ShapeType, create_shape
 
@@ -20,6 +20,13 @@ class Object(Serializable):
 
     def get_info(self) -> str:
         return self._class_name + " [" + str(self._uuid) + "]"
+    
+    def get_shapes_info(self) -> List[Tuple[str, List[Tuple[str, str]]]]:
+        result = []
+        for shape in self._shapes:
+            result.append((shape.__class__.__name__, shape.get_points_info()))
+
+        return result
 
     def serialize(self) -> Dict:
         return super().serialize()

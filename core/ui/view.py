@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import pyqtSignal, QObject
 # from core.ui.graphics.drawable import Drawable
@@ -9,7 +9,7 @@ from core.ui.widgets import (
     FilesWidget,
     CanvasWidget,
     ObjectsWidget,
-    KeypointsWidget
+    ShapesWidget
 )
 
 
@@ -46,7 +46,7 @@ class View(QtWidgets.QMainWindow):
         self.tools_layout = QtWidgets.QVBoxLayout(self.tools_widget)
         self.files_widget = FilesWidget(self.tools_widget)
         self.objects_widget = ObjectsWidget(self.tools_widget)
-        self.keypoints_widget = KeypointsWidget(self.tools_widget)
+        self.keypoints_widget = ShapesWidget(self.tools_widget)
         # Connect to widgets events
         self.menubar_widget.events.files_open.connect(self.events.files_open.emit)
         self.menubar_widget.events.files_close_all.connect(self.events.files_close_all.emit)
@@ -56,9 +56,9 @@ class View(QtWidgets.QMainWindow):
         self.files_widget.events.curr_file_changed.connect(self.events.files_current_changed.emit)
         self.objects_widget.events.object_created.connect(self.events.object_created.emit)
         self.objects_widget.events.object_removed.connect(self.events.object_removed.emit)
-        self.objects_widget.events.curr_object_changed.connect(self.events.object_current_changed.emit)
-        self.keypoints_widget.events.curr_keypoint_changed.connect(self.events.keypoint_current_changed.emit)
-        self.keypoints_widget.events.keypoint_disabled.connect(self.events.keypoint_disabled.emit)
+        self.objects_widget.events.current_object_changed.connect(self.events.object_current_changed.emit)
+        # self.keypoints_widget.events.curr_keypoint_changed.connect(self.events.keypoint_current_changed.emit)
+        # self.keypoints_widget.events.keypoint_disabled.connect(self.events.keypoint_disabled.emit)
         self.canvas_widget.events.mouse_left_clicked.connect(self.events.canvas_mouse_left_clicked.emit)
         self.canvas_widget.events.mouse_right_clicked.connect(self.events.canvas_mouse_right_clicked.emit)
 
@@ -83,7 +83,7 @@ class View(QtWidgets.QMainWindow):
         # Tools area widgets
         self.top_layout.addWidget(self.tools_widget)
         self.tools_widget.setLayout(self.tools_layout)
-        self.tools_widget.setMaximumWidth(256)
+        self.tools_widget.setMaximumWidth(360)
         self.tools_layout.addWidget(self.files_widget)
         self.files_widget.initGUI()
         self.tools_layout.addWidget(self.objects_widget)
@@ -106,8 +106,8 @@ class View(QtWidgets.QMainWindow):
     def set_object_classes(self, classes: List[str]):
         self.objects_widget.set_object_classes(classes)
 
-    def set_keypoints_list(self, keypoints: List[str]):
-        self.keypoints_widget.set_keypoints(keypoints)
+    def set_object_shapes(self, data: List[Tuple[str, List[Tuple[str, str]]]]):
+        self.keypoints_widget.set_shapes(data)
 
     def set_curent_keypoint(self, idx: int):
         self.keypoints_widget.set_current_row(idx)
