@@ -1,10 +1,8 @@
 from typing import List, Tuple
 from PyQt5 import QtWidgets
+from PyQt5.QtCore import QPoint
 from core.ui.view import View
 from core.engine.model import Model
-from core.engine.shapes import ShapeType
-# from core.config import car_nodes, car_edges
-# from core.controller.drawables import DrawKeypoints
 
 
 class Controller():
@@ -22,10 +20,10 @@ class Controller():
         self._view.events.object_created.connect(self.on_view_object_created)
         self._view.events.object_removed.connect(self.on_view_object_removed)
         self._view.events.object_current_changed.connect(self.on_view_obejct_current_changed)
-        # self.view.events.keypoint_current_changed.connect(self.on_view_keypoint_cur_changed)
         # self.view.events.keypoint_disabled.connect(self.on_view_keypoint_disabled)
-        # self.view.events.canvas_mouse_left_clicked.connect(self.on_view_canvas_mouse_left_clicked)
-        # self.view.events.canvas_mouse_right_clicked.connect(self.on_view_canvas_mouse_right_clicked)
+        self._view.events.shapes_current_item_changed.connect(self.on_shapes_current_item_changed)
+        self._view.events.canvas_mouse_left_clicked.connect(self.on_view_canvas_mouse_left_clicked)
+        self._view.events.canvas_mouse_right_clicked.connect(self.on_view_canvas_mouse_right_clicked)
         self._initialize()
 
     def _initialize(self):
@@ -46,7 +44,7 @@ class Controller():
                 self._view.repaint_canvas()
                 # Objects
                 objs = cur_ctx.get().get_objects_list()
-                self._view.set_objects_list(objs)
+                self._view.set_objects_list(objs, cur_ctx.get().get_current_object_idx())
                 # Shapes
                 shapes = {}
                 cur_obj = cur_ctx.get().get_current_object()
@@ -60,6 +58,7 @@ class Controller():
         actual_files = self._model.get_files()
         self._view.set_files_list(actual_files)
         # Canvas
+        self._view.set_drawables([])
         self._view.clear_canvas()
         self._view.repaint_canvas()
         # Objects
@@ -74,16 +73,19 @@ class Controller():
                 if cur_ctx is not None:
                     # Canvas
                     self._view.set_canvas_image(cur_ctx.get().get_fname())
-                    self._view.repaint_canvas()
                     # Objects
                     objs = cur_ctx.get().get_objects_list()
-                    self._view.set_objects_list(objs)
+                    self._view.set_objects_list(objs, cur_ctx.get().get_current_object_idx())
                     # Shapes
                     shapes = {}
                     cur_obj = cur_ctx.get().get_current_object()
                     if cur_obj is not None:
                         shapes = cur_obj.get_shapes_info()
+                        self._view.set_drawables([cur_obj.get_current_shape()])
+                    else:
+                        self._view.set_drawables([])
                     self._view.set_object_shapes(shapes)
+                    self._view.repaint_canvas()
 
     def on_view_object_created(self, class_idx: int):
         if self._model.create_object(class_idx):
@@ -91,12 +93,14 @@ class Controller():
             if cur_ctx is not None:
                 # Objects
                 objs = cur_ctx.get().get_objects_list()
-                self._view.set_objects_list(objs)
+                self._view.set_objects_list(objs, cur_ctx.get().get_current_object_idx())
                 # Shapes
                 shapes = {}
                 cur_obj = cur_ctx.get().get_current_object()
                 if cur_obj is not None:
                     shapes = cur_obj.get_shapes_info()
+                    self._view.set_drawables([cur_obj.get_current_shape()])
+                    self._view.repaint_canvas()
                 self._view.set_object_shapes(shapes)
 
     def on_view_object_removed(self, idx: int):
@@ -105,12 +109,16 @@ class Controller():
             if cur_ctx.get().remove_object(idx):
                 # Objects
                 objs = cur_ctx.get().get_objects_list()
-                self._view.set_objects_list(objs)
+                self._view.set_objects_list(objs, cur_ctx.get().get_current_object_idx())
                 # Shapes
                 shapes = {}
                 cur_obj = cur_ctx.get().get_current_object()
                 if cur_obj is not None:
                     shapes = cur_obj.get_shapes_info()
+                    self._view.set_drawables([cur_obj.get_current_shape()])
+                else:
+                    self._view.set_drawables([])
+                self._view.repaint_canvas()
                 self._view.set_object_shapes(shapes)
 
     def on_view_obejct_current_changed(self, cur_idx: int):
@@ -122,22 +130,20 @@ class Controller():
                 cur_obj = cur_ctx.get().get_current_object()
                 if cur_obj is not None:
                     shapes = cur_obj.get_shapes_info()
+                    self._view.set_drawables([cur_obj.get_current_shape()])
+                    self._view.repaint_canvas()
                 self._view.set_object_shapes(shapes)
 
-    # def on_view_keypoint_cur_changed(self, cur: int):
-    #     cur_ctx = self.model.get_current_file_context()
-    #     if cur_ctx is not None:
-    #         cur_obj = cur_ctx.get().get_current_object()
-    #         if cur_obj is not None:
-    #             if cur_obj.shape.set_curr_keypoint_idx(cur):
-    #                 pass
-    #                 # TODO: draw on canvas current keypoint...
-    #                 # TODO: get_curr_keypoint()
-    #                 self.view.repaint_background() # TODO: or repaint only GL painter layer ?
-
-    #             pt = cur_obj.shape.get_current_keypoint()
-    #             if pt is not None:
-    #                 print(f"CUR KEYPOINT: {cur}, POS: {pt.x}, {pt.y}")
+    def on_shapes_current_item_changed(self, shape_idx: int, point_idx: int):
+        cur_ctx = self._model.get_current_context()
+        if cur_ctx is not None:
+            cur_obj = cur_ctx.get().get_current_object()
+            if cur_obj is not None:
+                if cur_obj.set_current_shape_idx(shape_idx):
+                    shape = cur_obj.get_current_shape()
+                    if shape.set_current_point_idx(point_idx):
+                        self._view.set_drawables([shape])
+                        self._view.repaint_canvas() # TODO: or repaint only GL painter layer ?
 
     # def on_view_keypoint_disabled(self):
     #     cur_ctx = self.model.get_current_file_context()
@@ -147,26 +153,28 @@ class Controller():
     #             cur_obj.shape.disable_cur_keypoint()
     #             self.view.repaint_background()
 
-    # def on_view_canvas_mouse_left_clicked(self, pos: Tuple[int, int]):
-    #     print("LEFT CLICKED: ", pos)
-    #     cur_ctx = self.model.get_current_file_context()
-    #     if cur_ctx is not None:
-    #         cur_obj = cur_ctx.get().get_current_object()
-    #         if cur_obj is not None:
-    #             cur_obj.shape.set_curr_keypoint(pos)
-    #             self.view.set_drawables([DrawKeypoints(cur_obj.shape)])
-    #             self.view.repaint_background() # TODO: or repaint only GL painter layer ?
+    def on_view_canvas_mouse_left_clicked(self, pos: Tuple[int, int]):
+        cur_ctx = self._model.get_current_context()
+        if cur_ctx is not None:
+            cur_obj = cur_ctx.get().get_current_object()
+            if cur_obj is not None:
+                shape = cur_obj.get_current_shape()
+                shape.on_left_mouse_clicked(QPoint(*pos))
+                # self._view.set_drawables([shape])
+                shapes = cur_obj.get_shapes_info()
+                self._view.set_object_shapes(shapes, cur_obj.get_current_shape_idx(), shape.get_current_point_idx())
+                self._view.repaint_canvas() # TODO: or repaint only GL painter layer ?
 
-    # def on_view_canvas_mouse_right_clicked(self, pos: Tuple[int, int]):
-    #     print("RIGHT CLICKED: ", pos)
-    #     cur_ctx = self.model.get_current_file_context()
-    #     if cur_ctx is not None:
-    #         cur_obj = cur_ctx.get().get_current_object()
-    #         if cur_obj is not None:
-    #             cur_obj.shape.set_curr_keypoint_idx_by_coords(pos[0], pos[1])
-    #             # self.view.set_drawables([DrawKeypoints(cur_obj.shape)])
-    #             self.view.set_curent_keypoint(cur_obj.shape.curr_keypoint_idx)
-    #             self.view.repaint_background() # TODO: or repaint only GL painter layer ?
+    def on_view_canvas_mouse_right_clicked(self, pos: Tuple[int, int]):
+        cur_ctx = self._model.get_current_context()
+        if cur_ctx is not None:
+            cur_obj = cur_ctx.get().get_current_object()
+            if cur_obj is not None:
+                shape = cur_obj.get_current_shape()
+                shape.on_right_mouse_clicked(QPoint(*pos))
+                # self._view.set_drawables([cur_obj.get_shape(0)])
+                self._view.repaint_canvas() # TODO: or repaint only GL painter layer ?
+                self._view.set_shapes_curent_item(0, cur_obj._shapes[0].get_current_point_idx())
 
     def on_view_app_exit(self):
         self._model.close()

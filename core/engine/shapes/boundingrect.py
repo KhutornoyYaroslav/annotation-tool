@@ -6,7 +6,7 @@ from core.engine.shapes.shapeinterface import ShapeInterface
 
 class BoundingRect(ShapeInterface):
     def __init__(self):
-        self._points = dict.fromkeys({"top-left", "bottom-right"}, None)
+        self._points = dict.fromkeys(["top-left", "bottom-right"], None)
         self._cur_idx = 0
 
     def is_empty(self) -> bool:
@@ -18,11 +18,11 @@ class BoundingRect(ShapeInterface):
 
     def get_points_list(self) -> List[str]:
         return list(self._points.keys())
-    
+
     def get_points_info(self) -> List[Tuple[str, str]]:
         result = []
         for key, val in self._points.items():
-            val_str = "none" if val is None else ", ".join([val.x(), val.y()])
+            val_str = "none" if val is None else ", ".join([str(val.x()), str(val.y())])
             result.append((key, val_str))
 
         return result
@@ -52,20 +52,24 @@ class BoundingRect(ShapeInterface):
 
         return False
 
-    def set_current_idx(self, idx: int) -> bool:
+    def get_current_point_idx(self) -> int:
+        return self._cur_idx
+
+    def set_current_point_idx(self, idx: int) -> bool:
         if 0 <= idx < len(self._points):
             self._cur_idx = idx
             return True
 
         return False
 
-    def set_current_idx_by_position(self, pos: QPoint, max_radius: int = 8) -> bool:
+    def set_current_point_idx_by_position(self, pos: QPoint, max_radius: int = 8) -> bool:
         idx_best = None
         dist_best = max_radius
 
         for idx, pt in enumerate(self._points.values()):
             if pt is not None:
-                dist = QPoint.dotProduct(pt, pos) ** (1/2)
+                delta = pt - pos
+                dist = (delta.x() ** 2 + delta.y() ** 2) ** (1/2)
                 if dist <= dist_best:
                     dist_best = dist
                     idx_best = idx
@@ -88,7 +92,7 @@ class BoundingRect(ShapeInterface):
         self.set_current_point(pos)
 
     def on_right_mouse_clicked(self, pos: QPoint):
-        self.set_current_idx_by_position(pos)
+        self.set_current_point_idx_by_position(pos)
 
     def draw(self, painter: QPainter, img2viewport: Optional[Callable[[QPoint], QPoint]] = None):
         # Edges

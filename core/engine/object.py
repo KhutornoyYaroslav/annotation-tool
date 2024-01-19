@@ -1,5 +1,5 @@
 from uuid import UUID, uuid4
-from typing import List, Dict, Tuple, Optional
+from typing import List, Dict, Tuple, Optional, Union
 from core.utils.serializable import Serializable
 from core.engine.shapes import ShapeInterface, ShapeType, create_shape
 
@@ -8,6 +8,7 @@ class Object(Serializable):
     def __init__(self, shapes: List[ShapeInterface], class_name: str, uuid: Optional[UUID] = None):
         assert len(shapes) != 0
         self._shapes = shapes
+        self._cur_shape_idx = 0
         self._class_name = class_name
         self._uuid = uuid4() if uuid is None else uuid
 
@@ -18,9 +19,25 @@ class Object(Serializable):
 
         return False
 
+    def get_current_shape(self) -> ShapeInterface:
+        return self._shapes[self._cur_shape_idx]
+
+    def set_current_shape_idx(self, idx: int) -> bool:
+        if 0 <= idx < len(self._shapes):
+            self._cur_shape_idx = idx
+            return True
+
+        return False
+
+    def get_current_shape_idx(self) -> int:
+        return self._cur_shape_idx
+
+    def get_shapes(self) -> List[ShapeInterface]:
+        return self._shapes
+
     def get_info(self) -> str:
         return self._class_name + " [" + str(self._uuid) + "]"
-    
+
     def get_shapes_info(self) -> List[Tuple[str, List[Tuple[str, str]]]]:
         result = []
         for shape in self._shapes:

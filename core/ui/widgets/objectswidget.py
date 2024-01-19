@@ -45,12 +45,12 @@ class ObjectsWidget(QtWidgets.QGroupBox):
         self.button_remove.setText("Remove")
         self.button_remove.clicked.connect(self.on_object_removed)
 
-    def set_objects(self, objects: List[str]):
+    def set_objects(self, objects: List[str], current_object: int = 0):
         self.list_widget.clear()
         for obj in objects:
             self.list_widget.addItem(obj)
         if self.list_widget.count() > 0:
-            self.list_widget.setCurrentRow(0)
+            self.list_widget.setCurrentRow(current_object)
 
     def set_object_classes(self, classes: List[str]):
         self._obj_classes = classes

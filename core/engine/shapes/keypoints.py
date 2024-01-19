@@ -37,7 +37,7 @@ class Keypoints(ShapeInterface):
         key = list(self._keypoints.keys())[self._cur_idx]
         self._keypoints[key] = None
 
-    def set_current_idx(self, idx: int) -> bool:
+    def set_current_point_idx(self, idx: int) -> bool:
         if 0 <= idx < len(self._keypoints):
             self._cur_idx = idx
             return True

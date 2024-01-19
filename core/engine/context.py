@@ -73,3 +73,6 @@ class Context(Serializable):
             return True
 
         return False
+
+    def get_current_object_idx(self) -> int:
+        return self._cur_object_idx

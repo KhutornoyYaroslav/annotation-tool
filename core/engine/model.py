@@ -1,5 +1,4 @@
 from typing import List
-# from core.config import image_extensions
 from core.utils.basicconfig import Config
 from core.engine.context import Context
 from core.engine.shapes import ShapeType

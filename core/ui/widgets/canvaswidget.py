@@ -5,7 +5,7 @@ from typing import Tuple, List
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import pyqtSignal, QObject, QPoint
 from core.ui.graphics.panandzoom import PanAndZoom
-# from core.ui.graphics.drawable import Drawable
+from core.utils.drawable import QtDrawable
 
 
 class CanvasWidgetEvents(QObject):
@@ -40,8 +40,7 @@ class CanvasWidget(QtWidgets.QOpenGLWidget):
     def set_zoom_factor(self, factor: float):
         self._zoom_factor = factor
 
-    # TODO: fix
-    def set_drawables(self, items): # : List[Drawable]):
+    def set_drawables(self, items: List[QtDrawable]):
         self.drawables = items
 
     def mousePressEvent(self, a0: QtGui.QMouseEvent) -> None:
