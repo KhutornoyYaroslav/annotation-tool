@@ -21,7 +21,13 @@ class ShapeInterface(Serializable, Interactable, QtDrawable):
     def get_current_point_idx(self) -> int:
         raise NotImplementedError
 
+    def to_next_point(self):
+        raise NotImplementedError
+
     def get_current_point(self) -> Union[QPoint, None]:
+        raise NotImplementedError
+
+    def disable_current_point(self):
         raise NotImplementedError
 
     # def set_current_point(self, pt: QPoint) -> bool:

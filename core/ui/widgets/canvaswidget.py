@@ -3,9 +3,11 @@ import OpenGL.GL as gl
 from OpenGL import GLU
 from typing import Tuple, List
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import pyqtSignal, QObject, QPoint
+from PyQt5.QtCore import pyqtSignal, QObject, QPoint, QLine, Qt
 from core.ui.graphics.panandzoom import PanAndZoom
 from core.utils.drawable import QtDrawable
+
+from PyQt5.QtGui import QPainter, QPen, QColor, QFont
 
 
 class CanvasWidgetEvents(QObject):
@@ -22,9 +24,13 @@ class CanvasWidget(QtWidgets.QOpenGLWidget):
         self.canvas = PanAndZoom()
         self.mouse_press_event_pos = QPoint(0, 0)
         self.mouse_prev_press_event_pos = QPoint(0, 0)
-        self.mouse_prev_press_event_button = QPoint(0, 0)
+        self.mouse_current_pos = QPoint(0, 0)
         self.drawables = []
         self._zoom_factor = 1.25
+        self.initialize()
+
+    def initialize(self):
+        self.setMouseTracking(True)
 
     def clear(self):
         self.canvas.clear()
@@ -46,12 +52,14 @@ class CanvasWidget(QtWidgets.QOpenGLWidget):
     def mousePressEvent(self, a0: QtGui.QMouseEvent) -> None:
         self.mouse_press_event_pos = a0.pos()
         self.mouse_prev_press_event_pos = a0.pos()
-        self.mouse_prev_press_event_button = a0.button()
 
         return super().mousePressEvent(a0)
 
     def mouseMoveEvent(self, a0: QtGui.QMouseEvent) -> None:
-        if self.mouse_prev_press_event_button == QtCore.Qt.LeftButton:
+        self.mouse_current_pos = a0.pos()
+        self.repaint()
+
+        if a0.buttons() == QtCore.Qt.LeftButton:
             if not self.canvas.is_empty():
                 pos_img = self.viewport2img(a0.pos())
                 prev_pos_img = self.viewport2img(self.mouse_prev_press_event_pos)
@@ -298,7 +306,15 @@ class CanvasWidget(QtWidgets.QOpenGLWidget):
             gl.glBindBuffer(gl.GL_PIXEL_UNPACK_BUFFER, 0)
 
         # Draw objects
+        painter = QtGui.QPainter(self)
         if not self.canvas.is_empty():
-            painter = QtGui.QPainter(self)
             for d in self.drawables:
                 d.draw(painter, self.img2viewport)
+
+        # Draw cursor
+        if not self.canvas.is_empty():
+            painter.setPen(QPen(QColor(0, 255, 0), 1.0, Qt.DashLine))
+            mx, my = self.mouse_current_pos.x(), self.mouse_current_pos.y()
+            hline = QLine(0, my, self.width(), my)
+            vline = QLine(mx, 0, mx, self.height())
+            painter.drawLines([hline, vline])

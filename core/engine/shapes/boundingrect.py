@@ -52,6 +52,16 @@ class BoundingRect(ShapeInterface):
 
         return False
 
+    def disable_current_point(self):
+        key = list(self._points.keys())[self._cur_idx]
+        self._points[key] = None
+
+    def to_next_point(self):
+        next_idx = self._cur_idx + 1
+        if next_idx >= len(self._points):
+            next_idx = 0
+        self._cur_idx = next_idx
+
     def get_current_point_idx(self) -> int:
         return self._cur_idx
 
@@ -96,7 +106,7 @@ class BoundingRect(ShapeInterface):
 
     def draw(self, painter: QPainter, img2viewport: Optional[Callable[[QPoint], QPoint]] = None):
         # Edges
-        painter.setPen(QPen(QColor(0, 255, 0), 1.0, Qt.DotLine))
+        painter.setPen(QPen(QColor(0, 255, 0), 1.0, Qt.SolidLine))
 
         if not None in self._points.values():
             tl = self._points["top-left"]
@@ -108,7 +118,7 @@ class BoundingRect(ShapeInterface):
                 painter.drawRect(tl_vp.x(), tl_vp.y(), br_vp.x() - tl_vp.x(), br_vp.y() - tl_vp.y())
 
         # Points
-        radius = 5.0 # radius = 0.0025 * np.linalg.norm(np.array(self.background.getViewport()[2:3]))
+        radius = 3.5 # radius = 0.0025 * np.linalg.norm(np.array(self.background.getViewport()[2:3]))
         painter.setPen(QPen(QColor(0, 255, 0, 100), 1.0))
         painter.setFont(QFont('Times', 2 * radius, QFont.Normal))
         painter.setBrush(QColor(255, 0, 0))

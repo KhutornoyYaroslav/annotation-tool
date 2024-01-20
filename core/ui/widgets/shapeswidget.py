@@ -1,4 +1,4 @@
-from typing import List, Dict, Tuple, Optional
+from typing import List, Tuple, Optional
 from PyQt5 import QtGui, QtWidgets
 from PyQt5.QtCore import pyqtSignal, QObject, Qt
 from PyQt5.QtGui import QKeyEvent, QMouseEvent
@@ -42,7 +42,8 @@ class TreeWidget(QtWidgets.QTreeWidget):
 
 class ShapesWidgetEvents(QObject):
     current_item_changed = pyqtSignal(int, int) # Shape idx, point idx
-    # keypoint_disabled = pyqtSignal()
+    current_item_disabled = pyqtSignal()
+    next_item_requested = pyqtSignal()
 
 
 class ShapesWidget(QtWidgets.QGroupBox):
@@ -54,8 +55,8 @@ class ShapesWidget(QtWidgets.QGroupBox):
         self.top_layout = QtWidgets.QVBoxLayout()
         self.buttons_layout = QtWidgets.QHBoxLayout()
         self.tree_widget = TreeWidget(self)
-        # self.button_disable = QtWidgets.QPushButton(self)
         self.shortcut_delete = QtWidgets.QShortcut(QtGui.QKeySequence.Delete, self)
+        self.shortcut_space = QtWidgets.QShortcut(Qt.Key_Space, self)
 
     def initGUI(self):
         self.setTitle("Object data")
@@ -72,15 +73,9 @@ class ShapesWidget(QtWidgets.QGroupBox):
         self.tree_widget.setRootIsDecorated(False)
         self.tree_widget.currentItemChanged.connect(self.on_current_item_changed)
 
-        # Buttons layout
-        # self.buttons_layout.addWidget(self.button_disable)
-
-        # Buttons
-        # self.button_disable.setText("Disable") # TODO: сделать невозможным нажимать кнопку, если точка и так disable
-        # self.button_disable.clicked.connect(self.events.keypoint_disabled.emit)
-
         # Shortcuts
-        # self.shortcut_delete.activated.connect(self.events.keypoint_disabled.emit)
+        self.shortcut_space.activated.connect(self.events.next_item_requested)
+        self.shortcut_delete.activated.connect(self.events.current_item_disabled)
 
     def on_current_item_changed(self, current: QtWidgets.QTreeWidgetItem, previous: QtWidgets.QTreeWidgetItem):
         if current is not None:
@@ -93,7 +88,6 @@ class ShapesWidget(QtWidgets.QGroupBox):
     def set_shapes(self, shapes: List[Tuple[str, List[Tuple[str, str]]]], current_shape: int = 0, current_point: int = 0):
         self.tree_widget.clear()
 
-        # item_to_select = None
         for shape_idx, shape in enumerate(shapes):
             shape_item = QtWidgets.QTreeWidgetItem(self.tree_widget)
             shape_item.setText(0, shape[0])
@@ -108,10 +102,6 @@ class ShapesWidget(QtWidgets.QGroupBox):
 
                 if shape_idx == current_shape and point_idx == current_point:
                     self.tree_widget.setCurrentItem(data_item)
-                # if item_to_select is None:
-                    # item_to_select = data_item
-
-            # self.tree_widget.setCurrentItem(item_to_select)
 
     def set_current_item(self, shape_idx: int, point_idx: int):
         shape_item = self.tree_widget.topLevelItem(shape_idx)
