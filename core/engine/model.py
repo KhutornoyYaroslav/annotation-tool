@@ -1,36 +1,23 @@
 from typing import List
 from core.utils.basicconfig import Config
 from core.engine.context import Context
-from core.engine.shapes import ShapeType
-from core.engine.object import ObjectFactory
 from core.engine.undoredo import UndoRedoContainer
-
+from core.engine.objects import build_object_factory
 
 class Model():
     def __init__(self, cfg: Config):
         self._cfg = cfg
         self._cur_file_idx = 0
         self._file_contexts: List[UndoRedoContainer[Context]] = []
-        self._object_factory = ObjectFactory()
-        self._initialize()
-
-    def _initialize(self):
-        for obj_class in self._cfg.annotation.classes:
-            shape_types = []
-            for sname in obj_class.shapes:
-                stype = ShapeType.from_str(sname)
-                if stype != None:
-                    shape_types.append(stype)
-            if len(shape_types):
-                self._object_factory.register_class(obj_class.name, shape_types)
+        self._object_factory = build_object_factory(cfg)
 
     def get_object_classes_list(self, full_info: bool = False) -> List[str]:
-        return self._object_factory.get_registered_classes(full_info)
+        return self._object_factory.get_registered_classes_info(full_info)
 
     def create_object(self, class_idx: int) -> bool:
         cur_ctx = self.get_current_context()
         if cur_ctx is not None:
-            class_name = self._object_factory.get_registered_classes()[class_idx]
+            class_name = self._object_factory.get_registered_classes_info()[class_idx]
             obj = self._object_factory.create_object(class_name)
             if obj is not None:
                 cur_ctx.get().append_object(obj)
@@ -40,11 +27,15 @@ class Model():
 
     def save_all(self):
         for ctx in self._file_contexts:
-            if not ctx.get().is_empty():
-                ctx.get().save()
+            # if not ctx.get().is_empty():
+            ctx.get().save()
+
+    def load_all(self):
+        for ctx in self._file_contexts:
+            ctx.get().load()
 
     def close(self):
-        # self.save_all() # TODO: uncomment later
+        self.save_all()
         self._file_contexts.clear()
         self._cur_file_idx = 0
 
@@ -57,13 +48,14 @@ class Model():
             if file.endswith(tuple(self._cfg.files.valid_extensions)):
                 files_filtered.append(file)
 
-        # self.save_all() # TODO: uncomment later
+        self.save_all()
         self._file_contexts.clear()
         for file in files_filtered:
             context = UndoRedoContainer()
-            context.add_action(Context(file))
+            context.add_action(Context(file, object_factory=self._object_factory))
             self._file_contexts.append(context)
         self._cur_file_idx = 0
+        self.load_all()
 
     def get_files(self) -> List[str]:
         files = []

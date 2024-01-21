@@ -3,7 +3,7 @@ from enum import Enum
 from .shapeinterface import ShapeInterface
 from .boundingrect import BoundingRect
 from .keypoints import Keypoints
-
+from .car_keypoints import car_nodes, car_edges
 
 class ShapeType(Enum):
     boundingrect = 1
@@ -23,7 +23,7 @@ def create_shape(type: ShapeType) -> ShapeInterface:
         return BoundingRect()
 
     if type == ShapeType.keypoints:
-        return Keypoints() # TODO: configurate
+        return Keypoints(car_nodes, car_edges)
 
     return None
 

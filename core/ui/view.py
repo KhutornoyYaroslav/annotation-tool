@@ -1,6 +1,7 @@
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import pyqtSignal, QObject
+from PyQt5.QtGui import QCloseEvent
 from core.utils.drawable import QtDrawable
 from core.utils.basicconfig import Config
 from core.ui.widgets import (
@@ -23,6 +24,7 @@ class ViewEvents(QObject):
     object_created = pyqtSignal(int)
     object_removed = pyqtSignal(int)
     object_current_changed = pyqtSignal(int)
+    object_draw_all_changed = pyqtSignal(bool)
     shapes_current_item_changed = pyqtSignal(int, int)
     shapes_current_item_disabled = pyqtSignal()
     shapes_next_item_requested = pyqtSignal()
@@ -57,6 +59,7 @@ class View(QtWidgets.QMainWindow):
         self.objects_widget.events.object_created.connect(self.events.object_created.emit)
         self.objects_widget.events.object_removed.connect(self.events.object_removed.emit)
         self.objects_widget.events.current_object_changed.connect(self.events.object_current_changed.emit)
+        self.objects_widget.events.draw_all_changed.connect(self.events.object_draw_all_changed.emit)
         self.shapes_widget.events.current_item_changed.connect(self.events.shapes_current_item_changed.emit)
         self.shapes_widget.events.current_item_disabled.connect(self.events.shapes_current_item_disabled.emit)
         self.shapes_widget.events.next_item_requested.connect(self.events.shapes_next_item_requested.emit)
@@ -98,16 +101,20 @@ class View(QtWidgets.QMainWindow):
         if self._cfg.view.appearance.fullscreen:
             self.showFullScreen()
 
+    def closeEvent(self, a0: Optional[QCloseEvent]) -> None:
+        self.events.app_exit.emit()
+        # return super().closeEvent(a0)
+
     def set_files_list(self, fnames: List[str]):
         self.files_widget.set_files(fnames)
 
-    def set_objects_list(self, objects: List[str], current_object: int = 0):
+    def set_objects_list(self, objects: List[str], current_object: int):
         self.objects_widget.set_objects(objects, current_object)
 
     def set_object_classes(self, classes: List[str]):
         self.objects_widget.set_object_classes(classes)
 
-    def set_object_shapes(self, data: List[Tuple[str, List[Tuple[str, str]]]], current_shape: int = 0, current_point: int = 0):
+    def set_object_shapes(self, data: List[Tuple[str, List[Tuple[str, str]]]], current_shape: int, current_point: int):
         self.shapes_widget.set_shapes(data, current_shape, current_point)
 
     def set_shapes_curent_item(self, shape_idx: int, point_idx: int):

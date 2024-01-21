@@ -23,7 +23,7 @@ def main() -> int:
     app = QtWidgets.QApplication(sys.argv)
     model = Model(cfg)
     view = View(cfg)
-    controller = Controller(app, view, model)
+    controller = Controller(view, model)
     view.initGUI()
     view.show()
 

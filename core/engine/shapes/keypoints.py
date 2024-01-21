@@ -1,56 +1,75 @@
 from PyQt5.QtCore import QPoint, Qt
 from PyQt5.QtGui import QPainter, QPen, QColor, QFont
-from typing import List, Tuple, Union, Optional, Callable
+from typing import List, Dict, Tuple, Union, Optional, Callable
 from core.engine.shapes.shapeinterface import ShapeInterface
 
 
 class Keypoints(ShapeInterface):
     def __init__(self, nodes: List[str], edges: List[Tuple[int, int]]):
         assert len(nodes) != 0
-        self._keypoints = dict.fromkeys(nodes, None)
+        self._points = dict.fromkeys(nodes, None)
         self._cur_idx = 0
         self._edges = edges
+        self.active = True
 
     def is_empty(self) -> bool:
-        for pt in self._keypoints:
+        for pt in self._points:
             if pt is not None:
                 return False
 
         return True
 
+    def set_active(self, active: bool):
+        self.active = active
+
     def get_points_list(self) -> List[str]:
-        return list(self._keypoints.keys())
+        return list(self._points.keys())
 
-    def get_current_keypoint(self) -> Union[QPoint, None]:
-        if not self.keypoints:
-            return None
+    def get_points_info(self) -> List[Tuple[str, str]]:
+        result = []
+        for key, val in self._points.items():
+            val_str = "none" if val is None else ", ".join([str(val.x()), str(val.y())])
+            result.append((key, val_str))
 
-        return list(self._keypoints.values())[self._cur_idx]
+        return result
 
-    def set_current_keypoint(self, pt: QPoint) -> bool:
-        key = list(self._keypoints.keys())[self._cur_idx]
-        self._keypoints[key] = pt
+    def get_current_point(self) -> Union[QPoint, None]:
+        return list(self._points.values())[self._cur_idx]
+
+    def set_current_point(self, pt: QPoint) -> bool:
+        key = list(self._points.keys())[self._cur_idx]
+        self._points[key] = pt
 
         return True
 
-    def disable_current_keypoint(self):
-        key = list(self._keypoints.keys())[self._cur_idx]
-        self._keypoints[key] = None
+    def disable_current_point(self):
+        key = list(self._points.keys())[self._cur_idx]
+        self._points[key] = None
+
+    def to_next_point(self):
+        next_idx = self._cur_idx + 1
+        if next_idx >= len(self._points):
+            next_idx = 0
+        self._cur_idx = next_idx
 
     def set_current_point_idx(self, idx: int) -> bool:
-        if 0 <= idx < len(self._keypoints):
+        if 0 <= idx < len(self._points):
             self._cur_idx = idx
             return True
 
         return False
 
-    def set_current_idx_by_position(self, pos: QPoint, max_radius: int = 8) -> bool:
+    def get_current_point_idx(self) -> int:
+        return self._cur_idx
+
+    def set_current_point_idx_by_position(self, pos: QPoint, max_radius: int = 8) -> bool:
         idx_best = None
         dist_best = max_radius
 
-        for idx, pt in enumerate(self._keypoints.values()):
+        for idx, pt in enumerate(self._points.values()):
             if pt is not None:
-                dist = QPoint.dotProduct(pt, pos) ** (1/2)
+                delta = pt - pos
+                dist = (delta.x() ** 2 + delta.y() ** 2) ** (1/2)
                 if dist <= dist_best:
                     dist_best = dist
                     idx_best = idx
@@ -61,25 +80,37 @@ class Keypoints(ShapeInterface):
 
         return False
 
-    # TODO: implement
-    # def serialize(self) -> Dict:
-    #     return super().serialize()
+    def serialize(self) -> Dict:
+        points = {}
+        for key, val in self._points.items():
+            val_ = None if val is None else {'x': val.x(), 'y': val.y()}
+            points[key] = val_
 
-    # TODO: implement
-    # def deserialize(self, data: Dict):
-    #     return super().deserialize(data)
+        data = {
+            'type': self.__class__.__name__,
+            'points': points
+        }
+
+        return data
+
+    def deserialize(self, data: Dict):
+        for key, val in data['points'].items():
+            self._points[key] = None if val is None else QPoint(val['x'], val['y'])
+
+        return self
 
     def on_left_mouse_clicked(self, pos: QPoint):
-        self.set_current_keypoint(pos)
+        self.set_current_point(pos)
 
     def on_right_mouse_clicked(self, pos: QPoint):
-        self.set_current_idx_by_position(pos)
+        self.set_current_point_idx_by_position(pos)
 
     def draw(self, painter: QPainter, img2viewport: Optional[Callable[[QPoint], QPoint]] = None):
         # Edges
-        painter.setPen(QPen(QColor(0, 255, 0), 1.0, Qt.DotLine))
+        painter.setPen(QPen(QColor(0, 255, 0, 150), 1.0, Qt.DotLine))
+        painter.setBrush(QColor(0, 0, 0, 0))
 
-        pts = list(self._keypoints.values())
+        pts = list(self._points.values())
         for edge in self._edges:
             pt1, pt2 = pts[edge[0]], pts[edge[1]]
             if pt1 is None or pt2 is None:
@@ -93,11 +124,11 @@ class Keypoints(ShapeInterface):
 
         # Nodes
         radius = 3.0 # radius = 0.0025 * np.linalg.norm(np.array(self.background.getViewport()[2:3]))
-        painter.setPen(QPen(QColor(0, 255, 0, 100), 1.0))
+        painter.setPen(QPen(QColor(0, 255, 0, 150), 1.0))
         painter.setFont(QFont('Times', 2 * radius, QFont.Normal))
-        painter.setBrush(QColor(255, 0, 0))
+        painter.setBrush(QColor(0, 255, 0))
 
-        for label, pt in self._keypoints.items():
+        for label, pt in self._points.items():
             if pt is None:
                 continue
             pt_vport = img2viewport(QPoint(pt.x(), pt.y()))
@@ -106,9 +137,11 @@ class Keypoints(ShapeInterface):
                 if label is not None:
                     painter.drawText(QPoint(pt_vport.x() + 2 * radius, pt_vport.y() - 2 * radius), str(label))
 
-        cur_pt = self.get_current_keypoint()
-        if cur_pt is not None:
-            pt_vport = img2viewport(QPoint(cur_pt.x(), cur_pt.y()))
-            if pt_vport is not None:
-                painter.setBrush(QColor(0, 0, 255))
-                painter.drawEllipse(pt_vport, radius, radius)
+        if self.active:
+            cur_pt = self.get_current_point()
+            if cur_pt is not None:
+                pt_vport = img2viewport(QPoint(cur_pt.x(), cur_pt.y()))
+                if pt_vport is not None:
+                    radius = 5
+                    painter.setPen(QPen(QColor(255, 0, 0, 200), 2.0))
+                    painter.drawArc(pt_vport.x() - radius, pt_vport.y() - radius, 2*radius, 2*radius, 0, 16 * 360)

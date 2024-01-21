@@ -85,7 +85,7 @@ class ShapesWidget(QtWidgets.QGroupBox):
                 point_idx = toplevel.indexOfChild(current)
                 self.events.current_item_changed.emit(shape_idx, point_idx)
 
-    def set_shapes(self, shapes: List[Tuple[str, List[Tuple[str, str]]]], current_shape: int = 0, current_point: int = 0):
+    def set_shapes(self, shapes: List[Tuple[str, List[Tuple[str, str]]]], current_shape: int, current_point: int):
         self.tree_widget.clear()
 
         for shape_idx, shape in enumerate(shapes):
@@ -101,7 +101,9 @@ class ShapesWidget(QtWidgets.QGroupBox):
                 shape_item.addChild(data_item)
 
                 if shape_idx == current_shape and point_idx == current_point:
+                    self.tree_widget.currentItemChanged.disconnect(self.on_current_item_changed)
                     self.tree_widget.setCurrentItem(data_item)
+                    self.tree_widget.currentItemChanged.connect(self.on_current_item_changed)
 
     def set_current_item(self, shape_idx: int, point_idx: int):
         shape_item = self.tree_widget.topLevelItem(shape_idx)

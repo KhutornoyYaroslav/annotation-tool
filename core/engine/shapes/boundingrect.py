@@ -1,6 +1,6 @@
 from PyQt5.QtCore import QPoint, Qt
 from PyQt5.QtGui import QPainter, QPen, QColor, QFont
-from typing import List, Tuple, Union, Optional, Callable
+from typing import Dict, List, Tuple, Union, Optional, Callable
 from core.engine.shapes.shapeinterface import ShapeInterface
 
 
@@ -8,6 +8,7 @@ class BoundingRect(ShapeInterface):
     def __init__(self):
         self._points = dict.fromkeys(["top-left", "bottom-right"], None)
         self._cur_idx = 0
+        self.active = True
 
     def is_empty(self) -> bool:
         for pt in self._points:
@@ -15,6 +16,9 @@ class BoundingRect(ShapeInterface):
                 return True
 
         return False
+
+    def set_active(self, active: bool):
+        self.active = active
 
     def get_points_list(self) -> List[str]:
         return list(self._points.keys())
@@ -28,9 +32,6 @@ class BoundingRect(ShapeInterface):
         return result
 
     def get_current_point(self) -> Union[QPoint, None]:
-        if not self._points:
-            return None
-
         return list(self._points.values())[self._cur_idx]
 
     def set_current_point(self, pt: QPoint) -> bool:
@@ -90,13 +91,24 @@ class BoundingRect(ShapeInterface):
 
         return False
 
-    # TODO: implement
-    # def serialize(self) -> Dict:
-    #     return super().serialize()
+    def serialize(self) -> Dict:
+        points = {}
+        for key, val in self._points.items():
+            val_ = None if val is None else {'x': val.x(), 'y': val.y()}
+            points[key] = val_
 
-    # TODO: implement
-    # def deserialize(self, data: Dict):
-    #     return super().deserialize(data)
+        data = {
+            'type': self.__class__.__name__,
+            'points': points
+        }
+
+        return data
+
+    def deserialize(self, data: Dict):
+        for key, val in data['points'].items():
+            self._points[key] = None if val is None else QPoint(val['x'], val['y'])
+
+        return self
 
     def on_left_mouse_clicked(self, pos: QPoint):
         self.set_current_point(pos)
@@ -106,7 +118,8 @@ class BoundingRect(ShapeInterface):
 
     def draw(self, painter: QPainter, img2viewport: Optional[Callable[[QPoint], QPoint]] = None):
         # Edges
-        painter.setPen(QPen(QColor(0, 255, 0), 1.0, Qt.SolidLine))
+        painter.setPen(QPen(QColor(0, 255, 0, 150), 1.0, Qt.SolidLine))
+        painter.setBrush(QColor(0, 0, 0, 0))
 
         if not None in self._points.values():
             tl = self._points["top-left"]
@@ -118,10 +131,10 @@ class BoundingRect(ShapeInterface):
                 painter.drawRect(tl_vp.x(), tl_vp.y(), br_vp.x() - tl_vp.x(), br_vp.y() - tl_vp.y())
 
         # Points
-        radius = 3.5 # radius = 0.0025 * np.linalg.norm(np.array(self.background.getViewport()[2:3]))
-        painter.setPen(QPen(QColor(0, 255, 0, 100), 1.0))
+        radius = 3.0 # radius = 0.0025 * np.linalg.norm(np.array(self.background.getViewport()[2:3]))
+        painter.setPen(QPen(QColor(0, 255, 0, 150), 1.0))
         painter.setFont(QFont('Times', 2 * radius, QFont.Normal))
-        painter.setBrush(QColor(255, 0, 0))
+        painter.setBrush(QColor(0, 255, 0))
 
         for label, pt in self._points.items():
             if pt is None:
@@ -132,9 +145,11 @@ class BoundingRect(ShapeInterface):
                 if label is not None:
                     painter.drawText(QPoint(pt_vport.x() + 2 * radius, pt_vport.y() - 2 * radius), str(label))
 
-        cur_pt = self.get_current_point()
-        if cur_pt is not None:
-            pt_vport = img2viewport(cur_pt)
-            if pt_vport is not None:
-                painter.setBrush(QColor(0, 0, 255))
-                painter.drawEllipse(pt_vport, radius, radius)
+        if self.active:
+            cur_pt = self.get_current_point()
+            if cur_pt is not None:
+                pt_vport = img2viewport(cur_pt)
+                if pt_vport is not None:
+                    radius = 5
+                    painter.setPen(QPen(QColor(255, 0, 0, 200), 2.0))
+                    painter.drawArc(pt_vport.x() - radius, pt_vport.y() - radius, 2*radius, 2*radius, 0, 16 * 360)

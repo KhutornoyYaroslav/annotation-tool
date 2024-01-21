@@ -30,6 +30,9 @@ class ShapeInterface(Serializable, Interactable, QtDrawable):
     def disable_current_point(self):
         raise NotImplementedError
 
+    def set_active(self, active: bool):
+        raise NotImplementedError
+
     # def set_current_point(self, pt: QPoint) -> bool:
     #     raise NotImplementedError
 

@@ -1,26 +1,33 @@
 import os
 import json
 from typing import Dict, List
-from core.engine.object import Object
+from core.engine.objects import Object, ObjectFactory
 from core.utils.serializable import Serializable
 
 
 class Context(Serializable):
-    def __init__(self, fname: str, objects: List[Object] = []):
+    def __init__(self, fname: str, objects: List[Object] = [], object_factory: ObjectFactory = None):
         self._fname = fname
         self._objects = objects
         self._cur_object_idx = 0
+        self._object_factory = object_factory
 
     def serialize(self) -> Dict:
         data = {
             'fname': self._fname,
-            'objects': [obj.serialize() for obj in self._objects if not obj.is_empty()]
+            # 'objects': [obj.serialize() for obj in self._objects if not obj.is_empty()]
+            'objects': [obj.serialize() for obj in self._objects]
         }
 
         return data
 
     def deserialize(self, data: Dict):
-        self._objects = [Object().deserialize(obj) for obj in data['objects']]
+        for obj_data in data['objects']:
+            obj = self._object_factory.create_object(obj_data['class'])
+            assert obj is not None
+            self._objects.append(obj.deserialize(obj_data))
+
+        return self
 
     def load(self) -> bool:
         if not os.path.exists(self._fname + ".json"):
@@ -76,3 +83,6 @@ class Context(Serializable):
 
     def get_current_object_idx(self) -> int:
         return self._cur_object_idx
+
+    def get_objects(self) -> List[Object]:
+        return self._objects

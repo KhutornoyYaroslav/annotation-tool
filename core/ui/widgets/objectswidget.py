@@ -1,6 +1,6 @@
 from typing import List
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import pyqtSignal, QObject
+from PyQt5.QtCore import pyqtSignal, QObject, Qt
 from core.ui.dialogs.newobject import NewObjectDialog
 
 
@@ -8,6 +8,7 @@ class ObjectsWidgetEvents(QObject):
     object_created = pyqtSignal(int)
     object_removed = pyqtSignal(int)
     current_object_changed = pyqtSignal(int)
+    draw_all_changed = pyqtSignal(bool)
 
 
 class ObjectsWidget(QtWidgets.QGroupBox):
@@ -22,6 +23,7 @@ class ObjectsWidget(QtWidgets.QGroupBox):
         self.list_widget = QtWidgets.QListWidget(self)
         self.button_create = QtWidgets.QPushButton(self)
         self.button_remove = QtWidgets.QPushButton(self)
+        self.checkbox_draw_all = QtWidgets.QCheckBox(self)
 
     def initGUI(self):
         self.setTitle("Objects")
@@ -37,6 +39,7 @@ class ObjectsWidget(QtWidgets.QGroupBox):
         # Buttons layout
         self.buttons_layout.addWidget(self.button_create)
         self.buttons_layout.addWidget(self.button_remove)
+        self.buttons_layout.addWidget(self.checkbox_draw_all)
 
         # Buttons
         self.button_create.setText("New...")
@@ -45,12 +48,17 @@ class ObjectsWidget(QtWidgets.QGroupBox):
         self.button_remove.setText("Remove")
         self.button_remove.clicked.connect(self.on_object_removed)
 
-    def set_objects(self, objects: List[str], current_object: int = 0):
+        self.checkbox_draw_all.setText("Draw all")
+        self.checkbox_draw_all.stateChanged.connect(self.on_checkbox_state_changed)
+
+    def set_objects(self, objects: List[str], current_object: int):
         self.list_widget.clear()
         for obj in objects:
             self.list_widget.addItem(obj)
         if self.list_widget.count() > 0:
+            self.list_widget.currentRowChanged.disconnect(self.on_current_row_changed)
             self.list_widget.setCurrentRow(current_object)
+            self.list_widget.currentRowChanged.connect(self.on_current_row_changed)
 
     def set_object_classes(self, classes: List[str]):
         self._obj_classes = classes
@@ -73,3 +81,6 @@ class ObjectsWidget(QtWidgets.QGroupBox):
             class_idx = dialog.get_current_row()
             if class_idx != -1:
                 self.events.object_created.emit(class_idx)
+
+    def on_checkbox_state_changed(self, state: int):
+        self.events.draw_all_changed.emit(state == Qt.CheckState.Checked)

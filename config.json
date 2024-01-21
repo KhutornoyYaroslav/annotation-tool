@@ -15,16 +15,10 @@
     "annotation": {
         "classes": [
             {
-                "name": "cat",
-                "shapes": [
-                    "BoundingRect"
-                ]
-            },
-            {
-                "name": "dog",
+                "name": "car",
                 "shapes": [
                     "BoundingRect",
-                    "BoundingRect"
+                    "Keypoints"
                 ]
             }
         ]

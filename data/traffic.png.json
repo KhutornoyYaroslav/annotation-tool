@@ -1,108 +1,57 @@
 {
-    "fname": "C:/repos/annotation-tool/data\\carla1.png",
+    "fname": "C:/repos/annotation-tool/data\\traffic.png",
     "objects": [
         {
             "class": "car",
-            "uuid": "eb1e712e-3bbe-451a-b4b7-ddc662533b1f",
+            "uuid": "18e9face-4e6b-4603-8383-413e1d90047d",
             "shapes": [
                 {
                     "type": "BoundingRect",
                     "points": {
                         "top-left": {
-                            "x": 143,
-                            "y": 440
+                            "x": 350,
+                            "y": 480
                         },
                         "bottom-right": {
-                            "x": 636,
-                            "y": 863
+                            "x": 563,
+                            "y": 669
                         }
                     }
                 },
                 {
                     "type": "Keypoints",
                     "points": {
-                        "fl wheel": {
-                            "x": 511,
-                            "y": 760
-                        },
-                        "bl wheel": {
-                            "x": 613,
-                            "y": 571
-                        },
+                        "fl wheel": null,
+                        "bl wheel": null,
                         "br wheel": null,
                         "fr wheel": null,
-                        "windshield tr": {
-                            "x": 318,
-                            "y": 534
-                        },
-                        "windshield tl": {
-                            "x": 493,
-                            "y": 534
-                        },
-                        "windshield bl": {
-                            "x": 496,
-                            "y": 628
-                        },
-                        "windshield br": {
-                            "x": 260,
-                            "y": 627
-                        },
+                        "windshield tr": null,
+                        "windshield tl": null,
+                        "windshield bl": null,
+                        "windshield br": null,
                         "rear window tl": null,
                         "rear window tr": null,
                         "rear window br": null,
                         "rear window bl": null,
-                        "rearview mirror l": {
-                            "x": 552,
-                            "y": 618
-                        },
-                        "rearview mirror r": {
-                            "x": 227,
-                            "y": 618
-                        },
-                        "bottom of license fr": {
-                            "x": 278,
-                            "y": 862
-                        },
-                        "bottom of license fl": {
-                            "x": 329,
-                            "y": 863
-                        },
+                        "rearview mirror l": null,
+                        "rearview mirror r": null,
+                        "bottom of license fr": null,
+                        "bottom of license fl": null,
                         "bottom of license bl": null,
                         "bottom of license br": null,
-                        "headlight fr inner bottom": {
-                            "x": 206,
-                            "y": 807
-                        },
-                        "headlight fr outer top": {
-                            "x": 153,
-                            "y": 775
-                        },
-                        "headlight fl inner bottom": {
-                            "x": 402,
-                            "y": 808
-                        },
-                        "headlight fl outer top": {
-                            "x": 468,
-                            "y": 777
-                        },
+                        "headlight fr inner bottom": null,
+                        "headlight fr outer top": null,
+                        "headlight fl inner bottom": null,
+                        "headlight fl outer top": null,
                         "headlight bl inner bottom": null,
                         "headlight bl outer top": null,
                         "headlight br inner bottom": null,
                         "headlight br outer top": null,
-                        "bottom bumper fl": {
-                            "x": 465,
-                            "y": 854
-                        },
+                        "bottom bumper fl": null,
                         "bottom bumper bl": null,
                         "bottom bumper br": null,
-                        "bottom bumper fr": {
-                            "x": 160,
-                            "y": 855
-                        },
-                        "side window back l": {
-                            "x": 586,
-                            "y": 519
-                        },
+                        "bottom bumper fr": null,
+                        "side window back l": null,
                         "side window back r": null
                     }
                 }
@@ -110,18 +59,18 @@
         },
         {
             "class": "car",
-            "uuid": "7756ed81-749c-4857-b555-bc372166a6d3",
+            "uuid": "abfd8a7c-f3f3-4e17-b32c-75e0b4165393",
             "shapes": [
                 {
                     "type": "BoundingRect",
                     "points": {
                         "top-left": {
-                            "x": 793,
-                            "y": 469
+                            "x": 600,
+                            "y": 160
                         },
                         "bottom-right": {
-                            "x": 1128,
-                            "y": 811
+                            "x": 714,
+                            "y": 255
                         }
                     }
                 },

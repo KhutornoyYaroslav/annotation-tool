@@ -26,12 +26,13 @@ car_nodes = [
     "headlight br inner bottom", # 24
     "headlight br outer top", # 25
     "bottom bumper fl", # 26
-    "bottom bumper bl", # 27
-    "bottom bumper br", # 28
-    "bottom bumper fr", # 29
+    "bottom bumper bl", # 27 # TODO: change order
+    "bottom bumper br", # 28 # TODO: change order
+    "bottom bumper fr", # 29 # TODO: change order
     "side window back l", # 30
     "side window back r" # 31
 ]
+
 car_edges = [
     [14, 15], [29, 14], [26, 15], [29, 26],
     [29, 18], [18,19], [18, 20], [19, 21],
@@ -51,6 +52,3 @@ car_edges = [
     [22, 23], [24, 22], [17, 16], [17, 24],
     [16, 22], [10, 11]
 ]
-image_extensions = ('png', 'jpg', 'jpeg', 'bmp', 'JPG')
-video_extensions = ('.avi', '.mp4', '.mkv')
-models_path = './models'

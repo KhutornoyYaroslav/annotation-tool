@@ -1,5 +1,5 @@
 from uuid import UUID, uuid4
-from typing import List, Dict, Tuple, Optional, Union
+from typing import List, Dict, Tuple, Optional
 from core.utils.serializable import Serializable
 from core.engine.shapes import ShapeInterface, ShapeType, create_shape
 
@@ -46,47 +46,21 @@ class Object(Serializable):
         return result
 
     def serialize(self) -> Dict:
-        return super().serialize()
+        data = {
+            'class': self._class_name,
+            'uuid': str(self._uuid),
+            'shapes': [s.serialize() for s in self._shapes]
+        }
+
+        return data
 
     def deserialize(self, data: Dict):
-        return super().deserialize(data)
+        self._uuid = UUID(data['uuid'])
 
+        self._shapes.clear() # TODO: check it
+        for shape_data in data['shapes']:
+            shape = create_shape(ShapeType.from_str(shape_data['type']))
+            assert shape is not None
+            self._shapes.append(shape.deserialize(shape_data))
 
-class ObjectFactory():
-    def __init__(self):
-        self._classes = {}
-
-    def register_class(self, name: str, shapes: List[ShapeType]) -> bool:
-        if name not in self._classes and len(shapes):
-            self._classes[name] = shapes
-            return True
-
-        return False
-
-    def get_registered_classes(self, full_info: bool = False) -> List[str]:
-        result = []
-        for name, shapes in self._classes.items():
-            info = name
-            if full_info:
-                info += f" [" + ", ".join([s.name for s in shapes]) + "]"
-            result.append(info)
-
-        return result
-
-    def unregister_class(self, name: str):
-        self._classes.pop(name, None)
-
-    def unregister_all_classes(self):
-        self._classes.clear()
-
-    def create_object(self, class_name: str) -> Object:
-        shape_types = self._classes.get(class_name, None)
-        if shape_types is not None:
-            shapes = []
-            for stype in shape_types:
-                shape = create_shape(stype)
-                shapes.append(shape)
-
-            return Object(shapes, class_name)
-
-        return None
+        return self
