@@ -1,5 +1,6 @@
 import os
 import json
+import ntpath
 from typing import Dict, List
 from core.engine.objects import Object, ObjectFactory
 from core.utils.serializable import Serializable
@@ -14,7 +15,7 @@ class Context(Serializable):
 
     def serialize(self) -> Dict:
         data = {
-            'fname': self._fname,
+            'fname': ntpath.basename(self._fname),
             # 'objects': [obj.serialize() for obj in self._objects if not obj.is_empty()]
             'objects': [obj.serialize() for obj in self._objects]
         }
