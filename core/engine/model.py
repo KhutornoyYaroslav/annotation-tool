@@ -4,6 +4,7 @@ from core.engine.context import Context
 from core.engine.undoredo import UndoRedoContainer
 from core.engine.objects import build_object_factory
 
+
 class Model():
     def __init__(self, cfg: Config):
         self._cfg = cfg
