@@ -52,7 +52,8 @@ class Controller():
                     shapes_to_draw.extend(obj.get_shapes())
             else:
                 if cur_obj is not None:
-                    shapes_to_draw.append(cur_obj.get_current_shape())
+                    # shapes_to_draw.append(cur_obj.get_current_shape())
+                    shapes_to_draw.extend(cur_obj.get_shapes())
             self._view.set_drawables(shapes_to_draw)
             self._view.repaint_canvas()
         else:

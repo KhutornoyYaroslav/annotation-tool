@@ -118,7 +118,7 @@ class BoundingRect(ShapeInterface):
 
     def draw(self, painter: QPainter, img2viewport: Optional[Callable[[QPoint], QPoint]] = None):
         # Edges
-        painter.setPen(QPen(QColor(0, 255, 0, 150), 1.0, Qt.SolidLine))
+        painter.setPen(QPen(QColor(204, 0, 204, 150), 1.0, Qt.SolidLine))
         painter.setBrush(QColor(0, 0, 0, 0))
 
         if not None in self._points.values():
@@ -132,9 +132,9 @@ class BoundingRect(ShapeInterface):
 
         # Points
         radius = 3.0 # radius = 0.0025 * np.linalg.norm(np.array(self.background.getViewport()[2:3]))
-        painter.setPen(QPen(QColor(0, 255, 0, 150), 1.0))
+        painter.setPen(QPen(QColor(204, 0, 204, 150), 1.0))
         painter.setFont(QFont('Times', 2 * radius, QFont.Normal))
-        painter.setBrush(QColor(0, 255, 0))
+        painter.setBrush(QColor(204, 0, 204))
 
         for label, pt in self._points.items():
             if pt is None:
