@@ -4,7 +4,7 @@ from OpenGL import GLU
 from typing import Tuple, List
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QPen, QColor
-from PyQt5.QtCore import pyqtSignal, QObject, QPoint, QLine, Qt
+from PyQt5.QtCore import pyqtSignal, QObject, QPoint, QLineF, Qt
 from core.ui.graphics.panandzoom import PanAndZoom
 from core.utils.drawable import QtDrawable
 
@@ -211,6 +211,6 @@ class CanvasWidget(QtWidgets.QOpenGLWidget):
         if not self.canvas.is_empty():
             painter.setPen(QPen(QColor(0, 255, 0), 1.0, Qt.DashLine))
             mx, my = self.mouse_current_pos.x(), self.mouse_current_pos.y()
-            hline = QLine(0, my, self.width(), my)
-            vline = QLine(mx, 0, mx, self.height())
+            hline = QLineF(0, my, self.width(), my)
+            vline = QLineF(mx, 0, mx, self.height())
             painter.drawLines([hline, vline])
