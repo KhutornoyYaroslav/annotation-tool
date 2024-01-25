@@ -30,6 +30,7 @@ class ViewEvents(QObject):
     shapes_current_item_changed = pyqtSignal(int, int)
     shapes_current_item_disabled = pyqtSignal()
     shapes_next_item_requested = pyqtSignal()
+    shapes_autoannotate_requested = pyqtSignal()
     canvas_mouse_left_clicked = pyqtSignal(tuple)
     canvas_mouse_right_clicked = pyqtSignal(tuple)
 
@@ -66,6 +67,7 @@ class View(QtWidgets.QMainWindow):
         self.shapes_widget.events.current_item_changed.connect(self.events.shapes_current_item_changed.emit)
         self.shapes_widget.events.current_item_disabled.connect(self.events.shapes_current_item_disabled.emit)
         self.shapes_widget.events.next_item_requested.connect(self.events.shapes_next_item_requested.emit)
+        self.shapes_widget.events.autoannotate_requested.connect(self.events.shapes_autoannotate_requested.emit)
         self.canvas_widget.events.mouse_left_clicked.connect(self.events.canvas_mouse_left_clicked.emit)
         self.canvas_widget.events.mouse_right_clicked.connect(self.events.canvas_mouse_right_clicked.emit)
 

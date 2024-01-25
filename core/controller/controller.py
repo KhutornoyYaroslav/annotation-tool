@@ -26,6 +26,7 @@ class Controller():
         self._view.events.shapes_current_item_changed.connect(self.on_shapes_current_item_changed)
         self._view.events.shapes_current_item_disabled.connect(self.on_shapes_current_item_disabled)
         self._view.events.shapes_next_item_requested.connect(self.on_shapes_next_item_requested)
+        self._view.events.shapes_autoannotate_requested.connect(self.on_shapes_autoannotate_requested)
         self._view.events.canvas_mouse_left_clicked.connect(self.on_view_canvas_mouse_left_clicked)
         self._view.events.canvas_mouse_right_clicked.connect(self.on_view_canvas_mouse_right_clicked)
         self._initialize()
@@ -260,6 +261,15 @@ class Controller():
                 self._view.set_object_shapes(shapes, cur_obj.get_current_shape_idx(), shape.get_current_point_idx())
                 self._view.repaint_canvas()
                 # self._update_view_objects()
+
+    def on_shapes_autoannotate_requested(self):
+        cur_ctx = self._model.get_current_context()
+        if cur_ctx is not None:
+            cur_obj = cur_ctx.get().get_current_object()
+            if cur_obj is not None:
+                if cur_obj.annotate_brect(cur_ctx.get().get_image()):
+                    self._update_view_objects()
+                    cur_ctx.get().save()
 
     def on_view_canvas_mouse_left_clicked(self, pos: Tuple[int, int]):
         cur_ctx = self._model.get_current_context()

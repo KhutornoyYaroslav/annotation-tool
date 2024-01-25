@@ -44,6 +44,7 @@ class ShapesWidgetEvents(QObject):
     current_item_changed = pyqtSignal(int, int) # Shape idx, point idx
     current_item_disabled = pyqtSignal()
     next_item_requested = pyqtSignal()
+    autoannotate_requested = pyqtSignal()
 
 
 class ShapesWidget(QtWidgets.QGroupBox):
@@ -55,6 +56,7 @@ class ShapesWidget(QtWidgets.QGroupBox):
         self.top_layout = QtWidgets.QVBoxLayout()
         self.buttons_layout = QtWidgets.QHBoxLayout()
         self.tree_widget = TreeWidget(self)
+        self.button_autoannotate = QtWidgets.QPushButton(self)
         self.shortcut_delete = QtWidgets.QShortcut(QtGui.QKeySequence.Delete, self)
         self.shortcut_space = QtWidgets.QShortcut(Qt.Key_Space, self)
 
@@ -65,6 +67,13 @@ class ShapesWidget(QtWidgets.QGroupBox):
         # Top layout
         self.top_layout.addWidget(self.tree_widget)
         self.top_layout.addLayout(self.buttons_layout)
+
+        # Buttons layout
+        self.buttons_layout.addWidget(self.button_autoannotate)
+
+        # Buttons
+        self.button_autoannotate.setText("Annotate auto")
+        self.button_autoannotate.clicked.connect(self.events.autoannotate_requested.emit)
 
         # Tree
         self.tree_widget.setColumnCount(3)
