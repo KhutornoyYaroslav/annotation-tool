@@ -1,7 +1,9 @@
 import os
 import json
 import ntpath
-from typing import Dict, List
+import cv2 as cv
+import numpy as np
+from typing import Dict, List, Union
 from core.engine.objects import Object, ObjectFactory
 from core.utils.serializable import Serializable
 
@@ -21,6 +23,14 @@ class Context(Serializable):
         }
 
         return data
+
+    def get_image(self) -> Union[np.ndarray, None]:
+        img = cv.imread(self._fname, cv.IMREAD_COLOR)
+        if img is not None and img.size > 0:
+            img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+            return img
+
+        return None
 
     def deserialize(self, data: Dict):
         for obj_data in data['objects']:

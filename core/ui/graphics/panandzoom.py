@@ -15,15 +15,20 @@ class PanAndZoom:
     def is_empty(self):
         return self.img is None or self.img.size == 0
 
-    def load_image(self, path: str) -> bool:
-        img_ = cv.imread(path, cv.IMREAD_COLOR)
-        if img_ is not None and img_.size > 0:
-            self.img = cv.cvtColor(img_, cv.COLOR_BGR2RGB)
-            h, w = self.img.shape[0:2]
-            self.roi = (0, 0, w, h)
-            return True
+    # def load_image(self, path: str) -> bool:
+    #     img_ = cv.imread(path, cv.IMREAD_COLOR)
+    #     if img_ is not None and img_.size > 0:
+    #         self.img = cv.cvtColor(img_, cv.COLOR_BGR2RGB)
+    #         h, w = self.img.shape[0:2]
+    #         self.roi = (0, 0, w, h)
+    #         return True
 
-        return False
+    #     return False
+
+    def set_image(self, img: np.ndarray):
+        self.img = img
+        h, w = self.img.shape[0:2]
+        self.roi = (0, 0, w, h)
 
     def get_zoom_image(self, resize_to_orig_size: bool = True) -> np.ndarray:
         h, w = self.img.shape[0:2]

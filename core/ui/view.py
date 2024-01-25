@@ -1,3 +1,4 @@
+import numpy as np
 from typing import List, Tuple, Optional
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import pyqtSignal, QObject, QRect
@@ -122,8 +123,8 @@ class View(QtWidgets.QMainWindow):
     def set_shapes_curent_item(self, shape_idx: int, point_idx: int):
         self.shapes_widget.set_current_item(shape_idx, point_idx)
 
-    def set_canvas_image(self, fname: str) -> bool:
-        return self.canvas_widget.set_canvas_image(fname)
+    def set_canvas_image(self, img: np.ndarray):
+        self.canvas_widget.set_canvas_image(img)
 
     def set_canvas_focus(self, img_roi: QRect) -> bool:
         return self.canvas_widget.set_focus(img_roi)

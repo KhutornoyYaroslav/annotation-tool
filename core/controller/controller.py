@@ -82,7 +82,9 @@ class Controller():
         self._view.repaint_canvas()
         cur_ctx = self._model.get_current_context()
         if cur_ctx is not None:
-            if self._view.set_canvas_image(cur_ctx.get().get_fname()):
+            img = cur_ctx.get().get_image()
+            if img is not None:
+                self._view.set_canvas_image(img)
                 # self._view.repaint_canvas()
                 # # Objects
                 # objs = cur_ctx.get().get_objects_list()
@@ -116,7 +118,9 @@ class Controller():
                 cur_ctx = self._model.get_current_context()
                 if cur_ctx is not None:
                     # Canvas
-                    self._view.set_canvas_image(cur_ctx.get().get_fname())
+                    img = cur_ctx.get().get_image()
+                    if img is not None:
+                        self._view.set_canvas_image(img)
                     # # Objects
                     # objs = cur_ctx.get().get_objects_list()
                     # self._view.set_objects_list(objs, cur_ctx.get().get_current_object_idx())

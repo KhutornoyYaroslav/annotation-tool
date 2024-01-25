@@ -37,12 +37,9 @@ class CanvasWidget(QtWidgets.QOpenGLWidget):
         self.canvas.clear()
         self.gl_buffer_reload_flag = False
 
-    def set_canvas_image(self, path: str) -> bool:
-        if self.canvas.load_image(path):
-            self.gl_buffer_reload_flag = True
-            return True
-
-        return False
+    def set_canvas_image(self, img: np.ndarray):
+        self.canvas.set_image(img)
+        self.gl_buffer_reload_flag = True
 
     def set_zoom_factor(self, factor: float):
         self._zoom_factor = factor
