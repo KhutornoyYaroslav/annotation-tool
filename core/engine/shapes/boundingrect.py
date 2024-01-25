@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QPoint, Qt
+from PyQt5.QtCore import QPoint, Qt, QRect
 from PyQt5.QtGui import QPainter, QPen, QColor, QFont
 from typing import Dict, List, Tuple, Union, Optional, Callable
 from core.engine.shapes.shapeinterface import ShapeInterface
@@ -90,6 +90,25 @@ class BoundingRect(ShapeInterface):
             return True
 
         return False
+
+    def get_bounding_rect(self) -> Union[QRect, None]:
+        xs, ys = [], []
+        for point in self._points.values():
+            if point is not None:
+                xs.append(point.x())
+                ys.append(point.y())
+
+        if not len(xs) or not len(ys):
+            return None
+
+        top_left = QPoint(min(xs), min(ys))
+        bottom_right = QPoint(max(xs), max(ys))
+
+        if bottom_right == top_left:
+            bottom_right.setX(bottom_right.x() + 1)
+            bottom_right.setY(bottom_right.y() + 1)
+
+        return QRect(top_left, bottom_right)
 
     def serialize(self) -> Dict:
         points = {}

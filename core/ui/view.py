@@ -1,6 +1,6 @@
 from typing import List, Tuple, Optional
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import pyqtSignal, QObject
+from PyQt5.QtCore import pyqtSignal, QObject, QRect
 from PyQt5.QtGui import QCloseEvent
 from core.utils.drawable import QtDrawable
 from core.utils.basicconfig import Config
@@ -25,6 +25,7 @@ class ViewEvents(QObject):
     object_removed = pyqtSignal(int)
     object_current_changed = pyqtSignal(int)
     object_draw_all_changed = pyqtSignal(bool)
+    object_autofocus_changed = pyqtSignal(bool)
     shapes_current_item_changed = pyqtSignal(int, int)
     shapes_current_item_disabled = pyqtSignal()
     shapes_next_item_requested = pyqtSignal()
@@ -43,7 +44,7 @@ class View(QtWidgets.QMainWindow):
         self.statusbar_widget = StatusBar(self)
         self.top_widget = QtWidgets.QWidget(self)
         self.top_layout = QtWidgets.QHBoxLayout(self.top_widget)
-        self.canvas_widget = CanvasWidget(self.top_widget)
+        self.canvas_widget = CanvasWidget(self.top_widget, self._cfg)
         self.tools_widget = QtWidgets.QWidget(self.top_widget)
         self.tools_layout = QtWidgets.QVBoxLayout(self.tools_widget)
         self.files_widget = FilesWidget(self.tools_widget)
@@ -60,6 +61,7 @@ class View(QtWidgets.QMainWindow):
         self.objects_widget.events.object_removed.connect(self.events.object_removed.emit)
         self.objects_widget.events.current_object_changed.connect(self.events.object_current_changed.emit)
         self.objects_widget.events.draw_all_changed.connect(self.events.object_draw_all_changed.emit)
+        self.objects_widget.events.autofocus_changed.connect(self.events.object_autofocus_changed.emit)
         self.shapes_widget.events.current_item_changed.connect(self.events.shapes_current_item_changed.emit)
         self.shapes_widget.events.current_item_disabled.connect(self.events.shapes_current_item_disabled.emit)
         self.shapes_widget.events.next_item_requested.connect(self.events.shapes_next_item_requested.emit)
@@ -87,7 +89,7 @@ class View(QtWidgets.QMainWindow):
         # Tools area widgets
         self.top_layout.addWidget(self.tools_widget)
         self.tools_widget.setLayout(self.tools_layout)
-        self.tools_widget.setMaximumWidth(360)
+        self.tools_widget.setMaximumWidth(400)
         self.tools_layout.addWidget(self.files_widget)
         self.files_widget.initGUI()
         self.tools_layout.addWidget(self.objects_widget)
@@ -122,6 +124,9 @@ class View(QtWidgets.QMainWindow):
 
     def set_canvas_image(self, fname: str) -> bool:
         return self.canvas_widget.set_canvas_image(fname)
+
+    def set_canvas_focus(self, img_roi: QRect) -> bool:
+        return self.canvas_widget.set_focus(img_roi)
 
     def clear_canvas(self):
         self.canvas_widget.clear()

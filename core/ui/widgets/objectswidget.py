@@ -9,6 +9,7 @@ class ObjectsWidgetEvents(QObject):
     object_removed = pyqtSignal(int)
     current_object_changed = pyqtSignal(int)
     draw_all_changed = pyqtSignal(bool)
+    autofocus_changed = pyqtSignal(bool)
 
 
 class ObjectsWidget(QtWidgets.QGroupBox):
@@ -24,6 +25,7 @@ class ObjectsWidget(QtWidgets.QGroupBox):
         self.button_create = QtWidgets.QPushButton(self)
         self.button_remove = QtWidgets.QPushButton(self)
         self.checkbox_draw_all = QtWidgets.QCheckBox(self)
+        self.checkbox_autofocus = QtWidgets.QCheckBox(self)
 
     def initGUI(self):
         self.setTitle("Objects")
@@ -40,6 +42,7 @@ class ObjectsWidget(QtWidgets.QGroupBox):
         self.buttons_layout.addWidget(self.button_create)
         self.buttons_layout.addWidget(self.button_remove)
         self.buttons_layout.addWidget(self.checkbox_draw_all)
+        self.buttons_layout.addWidget(self.checkbox_autofocus)
 
         # Buttons
         self.button_create.setText("New...")
@@ -50,6 +53,9 @@ class ObjectsWidget(QtWidgets.QGroupBox):
 
         self.checkbox_draw_all.setText("Draw all")
         self.checkbox_draw_all.stateChanged.connect(self.on_checkbox_state_changed)
+
+        self.checkbox_autofocus.setText("Focus on")
+        self.checkbox_autofocus.stateChanged.connect(self.on_autofocus_state_changed)
 
     def set_objects(self, objects: List[str], current_object: int):
         self.list_widget.clear()
@@ -84,3 +90,6 @@ class ObjectsWidget(QtWidgets.QGroupBox):
 
     def on_checkbox_state_changed(self, state: int):
         self.events.draw_all_changed.emit(state == Qt.CheckState.Checked)
+
+    def on_autofocus_state_changed(self, state: int):
+        self.events.autofocus_changed.emit(state == Qt.CheckState.Checked)

@@ -71,3 +71,24 @@ class PanAndZoom:
         y_new = int(np.clip(y_new, 0, h - h_new))
 
         self.roi = (x_new, y_new, w_new, h_new)
+
+    def set_roi(self,
+                rect: Tuple[int, int, int, int],
+                keep_original_aspect: bool = True) -> bool:
+        h, w = self.img.shape[0:2]
+
+        rect_ = list(rect)
+        if keep_original_aspect:
+            new_h = int(rect_[2] * (h / w))
+            dy = int((rect_[3] - new_h) / 2)
+            rect_[3] = new_h
+            rect_[1] += dy
+
+        if rect_[2] == 0 or rect_[2] > w or rect_[3] == 0 or rect_[3] > h:
+            return False
+
+        rect_[0] = np.clip(rect_[0], 0, w - rect_[2])
+        rect_[1] = np.clip(rect_[1], 0, h - rect_[3])
+        self.roi = tuple(rect_)
+        
+        return True

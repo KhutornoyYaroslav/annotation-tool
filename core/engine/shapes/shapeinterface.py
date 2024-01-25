@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QPoint
+from PyQt5.QtCore import QPoint, QRect
 from typing import List, Tuple, Union
 from core.utils.drawable import QtDrawable
 from core.utils.serializable import Serializable
@@ -31,6 +31,9 @@ class ShapeInterface(Serializable, Interactable, QtDrawable):
         raise NotImplementedError
 
     def set_active(self, active: bool):
+        raise NotImplementedError
+
+    def get_bounding_rect(self) -> Union[QRect, None]:
         raise NotImplementedError
 
     # def set_current_point(self, pt: QPoint) -> bool:

@@ -11,6 +11,9 @@ cfg_.view.appearance.wndsize = [800, 600]
 # Control settings
 cfg_.control = DictNode()
 cfg_.control.zoom_factor = 1.25
+cfg_.control.auto_focus = DictNode()
+cfg_.control.auto_focus.pad_factor = 3.0
+cfg_.control.auto_focus.roi_min_width = 200
 # Annotation settings
 cfg_.annotation = DictNode()
 cfg_.annotation.classes = ListNode()

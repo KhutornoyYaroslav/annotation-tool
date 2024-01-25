@@ -4,9 +4,10 @@ from OpenGL import GLU
 from typing import Tuple, List
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QPen, QColor
-from PyQt5.QtCore import pyqtSignal, QObject, QPoint, QLineF, Qt
+from PyQt5.QtCore import pyqtSignal, QObject, QPoint, QLineF, Qt, QRect
 from core.ui.graphics.panandzoom import PanAndZoom
 from core.utils.drawable import QtDrawable
+from core.utils.basicconfig import Config
 
 
 class CanvasWidgetEvents(QObject):
@@ -15,8 +16,9 @@ class CanvasWidgetEvents(QObject):
 
 
 class CanvasWidget(QtWidgets.QOpenGLWidget):
-    def __init__(self, parent):
+    def __init__(self, parent, cfg: Config):
         QtWidgets.QOpenGLWidget.__init__(self, parent)
+        self._cfg = cfg
         self.events = CanvasWidgetEvents(self)
         self.gl_buffer_id = None
         self.gl_buffer_reload_flag = False
@@ -47,6 +49,25 @@ class CanvasWidget(QtWidgets.QOpenGLWidget):
 
     def set_drawables(self, items: List[QtDrawable]):
         self.drawables = items
+
+    def set_focus(self, img_roi: QRect) -> bool:
+        if not img_roi.isEmpty() and not self.canvas.is_empty():
+            pad_factor = self._cfg.control.auto_focus.pad_factor
+            min_width = self._cfg.control.auto_focus.roi_min_width
+
+            aspect = img_roi.width() / img_roi.height()
+            new_w = int(max(pad_factor * img_roi.width(), min_width))
+            new_h = int(new_w * aspect)
+            new_x = int(img_roi.x() + img_roi.width() / 2 - new_w / 2)
+            new_y = int(img_roi.y() + img_roi.height() / 2 - new_h / 2)
+            new_roi = QRect(new_x, new_y, new_w, new_h)
+
+            if self.canvas.set_roi((new_roi.x(), new_roi.y(), new_roi.width(), new_roi.height()), True):           
+                self.gl_buffer_reload_flag = True
+                self.repaint()
+                return True
+
+        return False
 
     def mousePressEvent(self, a0: QtGui.QMouseEvent) -> None:
         self.mouse_press_event_pos = a0.pos()

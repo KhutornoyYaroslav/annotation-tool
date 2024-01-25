@@ -7,6 +7,7 @@ from core.engine.model import Model
 class Controller():
     def __init__(self, view: View, model: Model):
         self._draw_all_objects = False
+        self._autofocus_on_current_object = False
         # Model, view instances
         self._view = view
         self._model = model
@@ -21,6 +22,7 @@ class Controller():
         self._view.events.object_removed.connect(self.on_view_object_removed)
         self._view.events.object_current_changed.connect(self.on_view_obejct_current_changed)
         self._view.events.object_draw_all_changed.connect(self.on_view_object_draw_all_changed)
+        self._view.events.object_autofocus_changed.connect(self.on_view_object_autofocus_changed)
         self._view.events.shapes_current_item_changed.connect(self.on_shapes_current_item_changed)
         self._view.events.shapes_current_item_disabled.connect(self.on_shapes_current_item_disabled)
         self._view.events.shapes_next_item_requested.connect(self.on_shapes_next_item_requested)
@@ -55,6 +57,13 @@ class Controller():
                     # shapes_to_draw.append(cur_obj.get_current_shape())
                     shapes_to_draw.extend(cur_obj.get_shapes())
             self._view.set_drawables(shapes_to_draw)
+            # Autofocusing on object
+            if self._autofocus_on_current_object:
+                if cur_obj is not None:
+                    brect = cur_obj.get_shapes_bounding_rect()
+                    if brect is not None:
+                        self._view.set_canvas_focus(brect)
+
             self._view.repaint_canvas()
         else:
             self._view.set_objects_list([], 0)
@@ -202,6 +211,10 @@ class Controller():
         #         if cur_obj is not None:
         #             self._view.set_drawables([cur_obj.get_current_shape()])
         #     self._view.repaint_canvas()
+        self._update_view_objects()
+
+    def on_view_object_autofocus_changed(self, state: bool):
+        self._autofocus_on_current_object = state
         self._update_view_objects()
 
     def on_shapes_current_item_changed(self, shape_idx: int, point_idx: int):

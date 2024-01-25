@@ -1,5 +1,6 @@
 from uuid import UUID, uuid4
-from typing import List, Dict, Tuple, Optional
+from PyQt5.QtCore import QRect
+from typing import List, Dict, Tuple, Optional, Union
 from core.utils.serializable import Serializable
 from core.engine.shapes import ShapeInterface, ShapeType, create_shape
 
@@ -44,6 +45,19 @@ class Object(Serializable):
             result.append((shape.__class__.__name__, shape.get_points_info()))
 
         return result
+    
+    def get_shapes_bounding_rect(self) -> Union[QRect, None]:
+        res = None
+        for shape in self._shapes:
+            br = shape.get_bounding_rect()
+            if br is not None:
+                if res is None:
+                    res = br
+                else:
+                    if br.width() * br.height() > res.width() * res.height():
+                        res = br
+
+        return res
 
     def serialize(self) -> Dict:
         data = {
