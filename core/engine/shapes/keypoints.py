@@ -13,7 +13,7 @@ class Keypoints(ShapeInterface):
         self.active = True
 
     def is_empty(self) -> bool:
-        for pt in self._points:
+        for pt in self._points.values():
             if pt is not None:
                 return False
 

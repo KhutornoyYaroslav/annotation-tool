@@ -3,9 +3,16 @@ import json
 import ntpath
 import cv2 as cv
 import numpy as np
+from enum import Enum
 from typing import Dict, List, Union
 from core.engine.objects import Object, ObjectFactory
 from core.utils.serializable import Serializable
+
+
+class AnnotationState(Enum):
+    EMPTY = 1
+    PARTITIALY = 2
+    FULL = 3
 
 
 class Context(Serializable):
@@ -97,3 +104,20 @@ class Context(Serializable):
 
     def get_objects(self) -> List[Object]:
         return self._objects
+
+    def get_annotation_state(self) -> AnnotationState:
+        obj_anno_full_cnt = 0
+        for obj in self._objects:
+            obj_anno_full = 1
+            for shape in obj.get_shapes():
+                if shape.is_empty():
+                    obj_anno_full = 0
+                    break
+            obj_anno_full_cnt += obj_anno_full
+
+        if not len(self._objects):
+            return AnnotationState.EMPTY
+        if obj_anno_full_cnt == len(self._objects):
+            return AnnotationState.FULL
+
+        return AnnotationState.PARTITIALY

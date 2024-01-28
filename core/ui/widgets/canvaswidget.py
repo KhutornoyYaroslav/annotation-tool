@@ -37,6 +37,10 @@ class CanvasWidget(QtWidgets.QOpenGLWidget):
         self.canvas.clear()
         self.gl_buffer_reload_flag = False
 
+    def clear_zoom(self):
+        self.canvas.clear_zoom()
+        self.gl_buffer_reload_flag = True
+
     def set_canvas_image(self, img: np.ndarray):
         self.canvas.set_image(img)
         self.gl_buffer_reload_flag = True
@@ -59,7 +63,7 @@ class CanvasWidget(QtWidgets.QOpenGLWidget):
             new_y = int(img_roi.y() + img_roi.height() / 2 - new_h / 2)
             new_roi = QRect(new_x, new_y, new_w, new_h)
 
-            if self.canvas.set_roi((new_roi.x(), new_roi.y(), new_roi.width(), new_roi.height()), True):           
+            if self.canvas.set_roi((new_roi.x(), new_roi.y(), new_roi.width(), new_roi.height()), True):
                 self.gl_buffer_reload_flag = True
                 self.repaint()
                 return True

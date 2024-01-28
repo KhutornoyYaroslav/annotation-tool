@@ -65,6 +65,9 @@ class Model():
 
         return files
 
+    def get_contexts(self) -> List[UndoRedoContainer[Context]]:
+        return self._file_contexts
+
     def get_current_context(self):
         if not self._file_contexts:
             return None

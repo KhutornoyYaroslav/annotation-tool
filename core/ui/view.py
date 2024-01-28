@@ -2,7 +2,7 @@ import numpy as np
 from typing import List, Tuple, Optional
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import pyqtSignal, QObject, QRect
-from PyQt5.QtGui import QCloseEvent
+from PyQt5.QtGui import QCloseEvent, QColor
 from core.utils.drawable import QtDrawable
 from core.utils.basicconfig import Config
 from core.ui.widgets import (
@@ -110,8 +110,8 @@ class View(QtWidgets.QMainWindow):
         self.events.app_exit.emit()
         # return super().closeEvent(a0)
 
-    def set_files_list(self, fnames: List[str]):
-        self.files_widget.set_files(fnames)
+    def set_files_list(self, fnames: List[str], current_file: int, colors: Optional[List[QColor]] = None):
+        self.files_widget.set_files(fnames, current_file, colors)
 
     def set_objects_list(self, objects: List[str], current_object: int):
         self.objects_widget.set_objects(objects, current_object)
@@ -136,6 +136,9 @@ class View(QtWidgets.QMainWindow):
 
     def repaint_canvas(self):
         self.canvas_widget.repaint()
+
+    def clear_canvas_zoom(self):
+        self.canvas_widget.clear_zoom()
 
     def set_drawables(self, items: List[QtDrawable]):
         self.canvas_widget.set_drawables(items)

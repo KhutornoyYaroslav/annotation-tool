@@ -1,13 +1,20 @@
 from typing import List, Tuple
 from PyQt5.QtCore import QPoint
+from PyQt5.QtGui import QColor
 from core.ui.view import View
 from core.engine.model import Model
+from core.engine.context import AnnotationState
 
 
 class Controller():
     def __init__(self, view: View, model: Model):
         self._draw_all_objects = False
         self._autofocus_on_current_object = False
+        self._anno_state_color_map = {
+            AnnotationState.EMPTY: QColor(255, 255, 255),
+            AnnotationState.FULL: QColor(153, 255, 153),
+            AnnotationState.PARTITIALY: QColor(255, 178, 102)
+        }
         # Model, view instances
         self._view = view
         self._model = model
@@ -34,6 +41,17 @@ class Controller():
     def _initialize(self):
         classes = self._model.get_object_classes_list(full_info=True)
         self._view.set_object_classes(classes)
+
+    def _update_view_files(self):
+        files = []
+        colors = []
+        for ctx in self._model.get_contexts():
+            fname = ctx.get().get_fname()
+            files.append(fname)
+            color = self._anno_state_color_map[ctx.get().get_annotation_state()]
+            colors.append(color)
+        current_file_idx = self._model.get_current_file_idx()
+        self._view.set_files_list(files, current_file_idx, colors)
 
     def _update_view_objects(self): # TODO: decompose on independant methods (objects / shapes / drawing)
         cur_ctx = self._model.get_current_context()
@@ -76,8 +94,7 @@ class Controller():
     def on_view_files_open(self, files: List[str]):
         self._model.set_files(files)
         # Files
-        actual_files = self._model.get_files()
-        self._view.set_files_list(actual_files)
+        self._update_view_files()
         # Canvas
         self._view.clear_canvas()
         self._view.repaint_canvas()
@@ -101,8 +118,7 @@ class Controller():
     def on_view_files_close_all(self):
         self._model.close()
         # Files
-        actual_files = self._model.get_files()
-        self._view.set_files_list(actual_files)
+        self._update_view_files()
         # Canvas
         # self._view.set_drawables([])
         # self._view.clear_canvas()
@@ -158,6 +174,7 @@ class Controller():
             #             self._view.set_drawables([cur_obj.get_current_shape()])
             #         self._view.repaint_canvas()
             #     self._view.set_object_shapes(shapes)
+            self._update_view_files()
             self._update_view_objects()
 
     def on_view_object_removed(self, idx: int):
@@ -180,6 +197,7 @@ class Controller():
                 #     self._view.set_drawables([])
                 # self._view.repaint_canvas()
                 # self._view.set_object_shapes(shapes)
+                self._update_view_files()
                 self._update_view_objects()
                 cur_ctx.get().save()
 
@@ -219,6 +237,8 @@ class Controller():
         self._update_view_objects()
 
     def on_view_object_autofocus_changed(self, state: bool):
+        if not state:
+            self._view.clear_canvas_zoom()
         self._autofocus_on_current_object = state
         self._update_view_objects()
 
@@ -249,6 +269,7 @@ class Controller():
                 self._view.repaint_canvas()
                 # self._update_view_objects()
                 cur_ctx.get().save()
+                self._update_view_files()
 
     def on_shapes_next_item_requested(self):
         cur_ctx = self._model.get_current_context()
@@ -268,6 +289,7 @@ class Controller():
             cur_obj = cur_ctx.get().get_current_object()
             if cur_obj is not None:
                 if cur_obj.annotate_brect(cur_ctx.get().get_image()):
+                    self._update_view_files()
                     self._update_view_objects()
                     cur_ctx.get().save()
 
@@ -283,6 +305,7 @@ class Controller():
                 self._view.repaint_canvas()
                 # self._update_view_objects()
                 cur_ctx.get().save()
+                self._update_view_files()
 
     def on_view_canvas_mouse_right_clicked(self, pos: Tuple[int, int]):
         cur_ctx = self._model.get_current_context()

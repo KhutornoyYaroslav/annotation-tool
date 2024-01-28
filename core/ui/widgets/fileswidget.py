@@ -1,6 +1,7 @@
-from typing import List
+from typing import List, Optional
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import pyqtSignal, QObject
+from PyQt5.QtGui import QColor
 
 
 class FilesWidgetEvents(QObject):
@@ -36,12 +37,15 @@ class FilesWidget(QtWidgets.QGroupBox):
         # self.button_status.setText("Mark as done")
         # self.button_status.clicked.connect(self.on_button_status_clicled)
 
-    def set_files(self, fnames: List[str]):
+    def set_files(self, fnames: List[str], current_file: int, colors: Optional[List[QColor]] = None):
         self.list_widget.clear()
-        for fname in fnames:
+        for idx, fname in enumerate(fnames):
             self.list_widget.addItem(fname)
+            if (colors is not None) and (idx < len(colors)):
+                self.list_widget.item(idx).setBackground(colors[idx])
+
         if self.list_widget.count() > 0:
-            self.list_widget.setCurrentRow(0)
+            self.list_widget.setCurrentRow(current_file)
 
     def on_current_row_changed(self, cur: int):
         if cur != -1:
