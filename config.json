@@ -10,7 +10,11 @@
         }
     },
     "control": {
-        "zoom_factor": 1.25
+        "zoom_factor": 1.3,
+        "auto_focus": {
+            "pad_factor": 2.0,
+            "roi_min_width": 200
+        }
     },
     "annotation": {
         "classes": [
