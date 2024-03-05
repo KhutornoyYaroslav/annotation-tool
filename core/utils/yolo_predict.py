@@ -8,9 +8,9 @@ def detect_cars(img: np.ndarray, min_conf: float = 0.5, model: str = 'yolov8m.pt
 
     if img is None or not img.size:
         return results
-    
+
     detector = YOLO(model)
-    predicts = detector.predict(img, conf=min_conf, imgsz=416, classes=[2], device=device)
+    predicts = detector.predict(img, conf=min_conf, imgsz=416, classes=[2]) #, device=device)
 
     for pred in predicts:
         confs = pred.boxes.conf.cpu().numpy()
