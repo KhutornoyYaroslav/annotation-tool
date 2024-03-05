@@ -77,7 +77,7 @@ def convert(src_root: str, dst_root: str) -> None:
 
 
 if __name__ == '__main__':
-    # convert(src_root="C:/Users/khutornoy/Documents/datasets/General dataset 987 pics",
-    #         dst_root="C:/Users/khutornoy/Documents/datasets/Generaldataset987pics_converted")
+    convert(src_root="C:/Users/khutornoy/Documents/datasets/General dataset 987 pics",
+            dst_root="C:/Users/khutornoy/Documents/datasets/Generaldataset987pics_converted")
     # convert(src_root="/media/yaroslav/SSD/khutornoy/data/CAR_KEYPOINTS/GeneralDataset987pics",
     #         dst_root="/media/yaroslav/SSD/khutornoy/data/CAR_KEYPOINTS/GeneralDataset987pics_converted/")
